@@ -28,13 +28,15 @@
   <div id="app"></div>
 
   <script>
-    const pattern = [
+    let pattern = [
       [0, 0, 0],
       [0, 0, 0],
       [0, 0, 0]
     ];
 
     let player = 1;
+
+    let gameOver = false;
 
     function show() {
       const wrap = document.getElementById('app');
@@ -49,6 +51,19 @@
             pattern[i][j] === 2 ? 'O' : '';
           cell.classList.add('cell');
           cell.addEventListener('click', () => {
+            if (gameOver) {
+              if (confirm('游戏已经结束！是否重新开始？')) {
+                gameOver = false;
+                player = 1;
+                pattern = [
+                  [0, 0, 0],
+                  [0, 0, 0],
+                  [0, 0, 0]
+                ];
+                show();
+              }
+              return false;
+            }
             if (pattern[i][j]) {
               alert('已经下过了');
               return false;
@@ -56,11 +71,72 @@
             pattern[i][j] = player;
             player = 3 - player;
             show();
+            setTimeout(() => {
+              let carrentPlayer = 3 - player;
+              if (checkWin(carrentPlayer)) {
+                alert((carrentPlayer === 1 ? 'X' : 'O') + '赢了');
+                gameOver = true;
+              }
+            }, 0);
+            
           })
           row.appendChild(cell);
         }
         wrap.appendChild(row);
       }
+    }
+
+    // 判断是否获胜（获胜可能性共 8 种，遍历判断）
+    function checkWin(player) {
+      {
+        for(let i in pattern) {
+          let win = true;
+          for (let j in pattern[i]) {
+            if (pattern[i][j] !== player) {
+              win =  false;
+            }
+          }
+          if (win) {
+            return true;
+          }
+        }
+      }
+      {
+        for(let i in pattern) {
+          let win = true;
+          for (let j in pattern[i]) {
+            if (pattern[j][i] !== player) {
+              win =  false;
+            }
+          }
+          if (win) {
+            return true;
+          }
+        }
+      }
+      {
+        let win = true;
+        for(let i in pattern) {
+          if (pattern[i][i] !== player) {
+            win = false;
+          }
+        }
+        if (win) {
+          return true;
+        }
+      }
+      {
+        let win = true;
+        for(let i in pattern) {
+          if (pattern[i][2 - i] !== player) {
+            win = false;
+          }
+        }
+        if (win) {
+          return true;
+        }
+      }
+      return false;
     }
 
     show();

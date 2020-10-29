@@ -72,11 +72,13 @@
             player = 3 - player;
             show();
             setTimeout(() => {
-              let carrentPlayer = 3 - player;
-              if (checkWin(carrentPlayer)) {
-                alert((carrentPlayer === 1 ? 'X' : 'O') + '赢了');
+              let currentPlayer = 3 - player;
+              if (checkWin(pattern, currentPlayer)) {
+                alert((currentPlayer === 1 ? 'X' : 'O') + ' 赢了');
                 gameOver = true;
               }
+              !gameOver && willWin(currentPlayer);
+              !gameOver && willWin(player);
             }, 0);
             
           })
@@ -87,7 +89,7 @@
     }
 
     // 判断是否获胜（获胜可能性共 8 种，遍历判断）
-    function checkWin(player) {
+    function checkWin(pattern, player) {
       {
         for(let i in pattern) {
           let win = true;
@@ -97,6 +99,7 @@
             }
           }
           if (win) {
+            // console.log('行', i);
             return true;
           }
         }
@@ -110,6 +113,7 @@
             }
           }
           if (win) {
+            // console.log('列', i);
             return true;
           }
         }
@@ -122,6 +126,7 @@
           }
         }
         if (win) {
+          // console.log('\\');
           return true;
         }
       }
@@ -133,7 +138,25 @@
           }
         }
         if (win) {
+          // console.log('//');
           return true;
+        }
+      }
+      return false;
+    }
+
+    function willWin(player) {
+      for (let i in pattern) {
+        for (let j in pattern[i]) {
+          if (!pattern[i][j]) {
+            let newPattern = JSON.parse(JSON.stringify(pattern));
+            newPattern[i][j] = player;
+            if (checkWin(newPattern, player)) {
+              // console.log(i, j);
+              console.log((player == 1 ? 'X' : 'O') + ' will win');
+              return true;
+            }
+          }
         }
       }
       return false;

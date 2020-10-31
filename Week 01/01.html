@@ -77,8 +77,15 @@
                 alert((currentPlayer === 1 ? 'X' : 'O') + ' 赢了');
                 gameOver = true;
               }
-              !gameOver && willWin(currentPlayer);
-              !gameOver && willWin(player);
+              if (!gameOver) {
+                if (willWin(pattern, currentPlayer)) {
+                  console.log((currentPlayer == 1 ? 'X' : 'O') + ' will win');
+                }
+                if (willWin(pattern, player)) {
+                  console.log((player == 1 ? 'X' : 'O') + ' will win');
+                }
+              };
+              computerMove();
             }, 0);
             
           })
@@ -86,6 +93,24 @@
         }
         wrap.appendChild(row);
       }
+      
+      console.log(bestChoice(pattern, player));
+    }
+
+    function computerMove() {
+      let point = bestChoice(pattern, player).point;
+      if (point) {
+        pattern[point.i][point.j] = player;
+      }
+      setTimeout(() => {     
+        if (checkWin(pattern, player)) {
+          alert((player === 1 ? 'X' : 'O') + ' 赢了');
+          gameOver = true;
+        } else {
+          player = 3 - player;
+        }
+      }, 100);
+      show();
     }
 
     // 判断是否获胜（获胜可能性共 8 种，遍历判断）
@@ -145,21 +170,59 @@
       return false;
     }
 
-    function willWin(player) {
+    function clone(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function willWin(pattern, player) {
       for (let i in pattern) {
         for (let j in pattern[i]) {
           if (!pattern[i][j]) {
-            let newPattern = JSON.parse(JSON.stringify(pattern));
+            let newPattern = clone(pattern);
             newPattern[i][j] = player;
             if (checkWin(newPattern, player)) {
               // console.log(i, j);
-              console.log((player == 1 ? 'X' : 'O') + ' will win');
-              return true;
+              return {i, j};
             }
           }
         }
       }
-      return false;
+      return null;
+    }
+
+
+    // 实现 AI 的核心代码
+    function bestChoice(pattern, player) {
+      let point;
+      if (point = willWin(pattern, player)) {
+        return {
+          point: point,
+          score: 1
+        }
+      }
+      // 分值设为一个不可能的低分
+      let score = -2;
+      point = null;
+
+      for (let i in pattern) {
+        for (let j in pattern[i]) {
+          if (pattern[i][j]) {
+            continue;
+          }
+          let obj = clone(pattern);
+          obj[i][j] = player;
+          let r = bestChoice(obj, 3 - player);
+          if (-r.score > score) {
+            score = -r.score;
+            point = {i, j}
+          }
+        }
+      }
+
+      return {
+        point: point,
+        score: point ? score : 0
+      };
     }
 
     show();

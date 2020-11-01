@@ -103,7 +103,47 @@ RN？本质上是用 JS 语言的 Native 开发，不是跨平台，和 web 开�
 步骤：
 1. [x] 编写棋盘，能把棋子渲染成 DOM
 1. [x] 点击棋盘，能落子
-1. [ ] 落子后能判断是否获胜
-1. [ ] 落子后，判断下一步是否有获胜机会
-1. [ ] 添加机器人，根据下一步获胜机会落子
+1. [x] 落子后能判断是否获胜
+1. [x] 落子后，判断下一步是否有获胜机会
+1. [x] 添加机器人，根据下一步获胜机会落子
 
+薄弱环节：对复杂逻辑的理解和处理比较弱，递归判断那耽搁了好久。
+
+### 20201031 async 异步编程
+1. [x] callback
+1. [x] promise
+1. [x] async/await
+1. [x] generator
+1. [x] async generator
+
+#### callback 方式
+使用 setTimeout 回调进行，ES5 之前只能使用这种方式，缺点是会导致代码层层嵌套，陷入回调地狱。
+
+#### promise 方式
+遇到问题：
+promise 功能掌握不够，手写写不出来。
+
+关键代码：
+```javascript
+function sleep(timeOut) {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, timeOut);
+  });
+}
+```
+返回一个 promise，用 setTimeout 定时触发 then。
+
+特点：链式调用。
+
+#### async/await 方式
+语法糖，实际还是通过 promise 方式执行。
+使用同步代码逻辑，更直观。
+
+#### generator 方式
+早期的 co 框架使用 generator 实现了类似 await 的调用方式，能按同步代码的方式书写。
+
+#### for await
+可以遍历一个异步生成器
+
+### **第一周小总结**
+平常以为掌握了的知识，在写代码的时候才发现写不出来，要去翻文档。熟练度还不够，要**多敲代码**。

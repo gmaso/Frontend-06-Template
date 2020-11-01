@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .wrapper {
+      width: 100px;
+    }
+    .light {
+      margin-bottom: 20px;
+      width: 100px;
+      height: 100px;
+      background-color: grey;
+      border-radius: 50px;
+    }
+    .red {
+      background-color: red;
+    }
+    .yellow {
+      background-color: yellow;
+    }
+    .green {
+      background-color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div id="green" class="light"></div>
+    <div id="yellow" class="light"></div>
+    <div id="red" class="light"></div>
+
+    <button id="btn">下一个</button>
+  </div>
+
+  <script>
+    let redDom = document.getElementById('red');
+    let yellowDom = document.getElementById('yellow');
+    let greenDom = document.getElementById('green');
+    let element = document.getElementById('btn');
+
+    function grey() {
+      greenDom.className = 'light';
+      yellowDom.className = 'light';
+      redDom.className = 'light';
+    }
+
+    function green() {
+      grey();
+      greenDom.className = 'light green';
+    }
+    function yellow() {
+      grey();
+      yellowDom.className = 'light yellow';
+    }
+    function red() {
+      grey();
+      redDom.className = 'light red';
+    }
+
+    function sleep (time) {
+      return new Promise((resolve, reject) => {
+        // 实际触发逻辑可以按需设置
+        // 定时触发
+        setTimeout(resolve, time);
+        // 手动触发。指定 once 只触发一次，避免事件重复绑定
+        // element.addEventListener('click', resolve, { once: true });
+      })
+    }
+
+    function* go() {
+      while(true) { // 无限循环
+        green();
+        yield sleep(2000);
+        yellow();
+        yield sleep(500);
+        red();
+        yield sleep(1000);
+      }
+    }
+
+    function run(iterator) {
+      let {value, done} = iterator.next();
+      if (done) {
+        return;
+      }
+      if (value instanceof Promise) {
+        value.then(() => {
+          run(iterator);
+        })
+      }
+    }
+
+    // 模仿早期的框架 co，其中会把 yield 当做 await 执行，模拟同步代码
+    function co(generator) {
+      return function() {
+        return run(generator());
+      }
+    }
+
+    go = co(go);
+  
+    go();
+
+    async function* counter() {
+      let i = 0;
+      while(true) {
+        await sleep(1000);
+        yield i++;
+      }
+    }
+
+    (async function(){
+      for await(let v of counter()) {
+        console.log(v);
+      }
+    })();
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>地图编辑器</title>
+  <style>
+    #container {
+      width: 800px;
+      font-size: 0;
+    }
+    .cell {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      line-height: 7px;
+      margin: 0 1px 1px 0;
+      background-color: grey;
+      vertical-align: top;
+    }
+    .cell.black {
+      background-color: black;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+
+  <button onclick="save()">保存地图</button>
+  <button onclick="empty()">清空地图</button>
+
+  <script>
+    let map = localStorage['map'] ? JSON.parse(localStorage['map']) : Array(10000).fill(0);
+
+    const container = document.getElementById('container');
+    
+    function draw() {
+      container.innerHTML = '';
+      for (let i = 0; i < 100; i += 1) {
+        for (let j = 0; j < 100; j += 1) {
+          let div = document.createElement('div');
+          div.classList.add('cell');
+          if (map[i * 100 + j] === 1) {
+            div.classList.add('black');
+          }
+
+          div.addEventListener('mouseover', () => {
+            if (mouseDown) {
+              if (clear) {
+                div.classList.remove('black');
+                map[i * 100 + j] = 0;
+              } else {
+                div.classList.add('black');
+                map[i * 100 + j] = 1;
+              }
+            }
+          })
+          container.appendChild(div);
+        }
+      }
+    }
+
+    draw();
+
+    let mouseDown = false;
+    let clear = false;
+    container.addEventListener('mousedown', (e) => {
+      mouseDown = true;
+      clear = e.button === 2;
+    });
+    container.addEventListener('mouseup', (e) => {
+      mouseDown = false;
+    });
+    container.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    function save() {
+      localStorage.setItem('map', JSON.stringify(map));
+    }
+
+    function empty() {
+      map = Array(10000).fill(0);
+      draw();
+      localStorage.setItem('map', JSON.stringify(map));
+    }
+
+  </script>
+</body>
+</html>

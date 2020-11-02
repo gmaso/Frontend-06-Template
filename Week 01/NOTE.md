@@ -102,6 +102,8 @@ RN？本质上是用 JS 语言的 Native 开发，不是跨平台，和 web 开�
 
 
 ## 20201028 TicTacToe | 实现一个 TicTacToe 游戏
+代码：[tictactoe](./tictactoe.html)
+
 编程训练：一部分跟算法相关，一部分跟语言相关。
 
 步骤：
@@ -120,10 +122,14 @@ RN？本质上是用 JS 语言的 Native 开发，不是跨平台，和 web 开�
 1. [x] generator
 1. [x] async generator
 
-#### callback 方式
+### callback 方式
+代码：[callback 方式](./async01-callback.html)
+
 使用 setTimeout 回调进行，ES5 之前只能使用这种方式，缺点是会导致代码层层嵌套，陷入回调地狱。
 
-#### promise 方式
+### promise 方式
+代码：[promise 方式](./async02-promise.html)
+
 遇到问题：
 promise 功能掌握不够，手写写不出来。
 
@@ -139,15 +145,43 @@ function sleep(timeOut) {
 
 特点：链式调用。
 
-#### async/await 方式
+### async/await 方式
+代码：[async/await 方式](./async03-async.html)
+
 语法糖，实际还是通过 promise 方式执行。
 使用同步代码逻辑，更直观。
 
-#### generator 方式
+### generator 方式
+代码：[generator 方式](./async04-generator.html)
+
 早期的 co 框架使用 generator 实现了类似 await 的调用方式，能按同步代码的方式书写。
 
-#### for await
+### for await
+代码：[for await](./async04-generator.html)
+
 可以遍历一个异步生成器
 
 ## **第一周小总结**
 平常以为掌握了的知识，在写代码的时候才发现写不出来，要去翻文档。熟练度还不够，要**多敲代码**。
+
+## 20201102 代码优化
+代码：[一维数组版 tictactoe](./tictactoe-1d.html)
+
+二维问题用一维数据表示。
+由于使用二维数组运行时开销比较大，使用一维数据表示性能更好。
+
+遇到问题：
+```
+tictactoe-1d.html:177 Uncaught RangeError: Maximum call stack size exceeded
+    at JSON.stringify (<anonymous>)
+```
+打印数据，发现数据为 [0, 0, 0, 0, 0, 0, 0, 0, 0, 00: 1]，赋值时新加了一个元素，而不是更新。
+还发现，bestChoice 在执行了 3804 次后，提示栈溢出。
+
+原因：使用 for in 循环，在每次迭代时，variable会被赋值为不同的属性名，而属性名为字符串，导致计算 i * 3 + j 时，得到的是字符串 00，赋值失败。**基础语法没弄清楚。**
+
+改为使用 for in 循环，刷新后页面阻塞执行了好长一段时间共 90000 多次才出结果，下一步棋又要执行 30000 多步。
+当把 console.log 注释掉后，运行速度大为改善，基本没有感知。说明 console.log 对 JS 执行速度有较大的影响。
+
+当加入胜利剪枝后，初始运行变为 36000 多次，下一步棋只有 4000 多次，再下一步更少。
+**才九个格子，计算量就如此之大，五子棋肯定不能采用如此暴力的遍历方式了。**

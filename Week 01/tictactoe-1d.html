@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .row {
+      width: 460px;
+    }
+    .cell {
+      display: inline-block;
+      margin-right: 3px;
+      margin-bottom: 3px;
+      width: 100px;
+      height: 100px;
+      font-size: 100px;
+      line-height: 100px;
+      text-align: center;
+      vertical-align: top;
+      background-color: green;
+      color: #fff;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    let pattern = [
+      0, 0, 0,
+      0, 0, 0,
+      0, 0, 0
+    ];
+
+    let rowIndex = [0, 1, 2];
+    let columnIndex = [0, 1, 2];
+
+    let player = 1;
+
+    let gameOver = false;
+
+    function show() {
+      const wrap = document.getElementById('app');
+      wrap.innerHTML = '';
+
+      for (let i of rowIndex) {
+        const row = document.createElement('div');
+        row.classList.add('row');
+        for (let j of columnIndex) {
+          const cell = document.createElement('div');
+          cell.innerText = pattern[i * 3 + j] === 1 ? 'X' :
+            pattern[i * 3 + j] === 2 ? 'O' : '';
+          cell.classList.add('cell');
+          cell.addEventListener('click', () => {
+            if (gameOver || pattern.every((item) => !!item)) {
+              if (confirm('游戏已经结束！是否重新开始？')) {
+                gameOver = false;
+                player = 1;
+                pattern = [
+                  0, 0, 0,
+                  0, 0, 0,
+                  0, 0, 0
+                ];
+                show();
+              }
+              return false;
+            }
+            if (pattern[i * 3 + j]) {
+              alert('已经下过了');
+              return false;
+            }
+            pattern[i * 3 + j] = player;
+            player = 3 - player;
+            show();
+            setTimeout(() => {
+              let currentPlayer = 3 - player;
+              if (checkWin(pattern, currentPlayer)) {
+                alert((currentPlayer === 1 ? 'X' : 'O') + ' 赢了');
+                gameOver = true;
+              }
+              if (!gameOver) {
+                if (willWin(pattern, currentPlayer)) {
+                  console.log((currentPlayer == 1 ? 'X' : 'O') + ' will win');
+                }
+                if (willWin(pattern, player)) {
+                  console.log((player == 1 ? 'X' : 'O') + ' will win');
+                }
+              };
+              computerMove();
+            }, 0);
+            
+          })
+          row.appendChild(cell);
+        }
+        wrap.appendChild(row);
+      }
+      
+      console.log(bestChoice(pattern, player));
+    }
+
+    function computerMove() {
+      let point = bestChoice(pattern, player).point;
+      if (point) {
+        pattern[point.i * 3 + point.j] = player;
+      }
+      setTimeout(() => {     
+        if (checkWin(pattern, player)) {
+          alert((player === 1 ? 'X' : 'O') + ' 赢了');
+          gameOver = true;
+        } else {
+          player = 3 - player;
+        }
+      }, 100);
+      show();
+    }
+
+    // 判断是否获胜（获胜可能性共 8 种，遍历判断）
+    function checkWin(pattern, player) {
+      {
+        for(let i of rowIndex) {
+          let win = true;
+          for (let j of columnIndex) {
+            if (pattern[i * 3 + j] !== player) {
+              win =  false;
+            }
+          }
+          if (win) {
+            // console.log('行', i);
+            return true;
+          }
+        }
+      }
+      {
+        for(let i of columnIndex) {
+          let win = true;
+          for (let j of rowIndex) {
+            if (pattern[j * 3 + i] !== player) {
+              win =  false;
+            }
+          }
+          if (win) {
+            // console.log('列', i);
+            return true;
+          }
+        }
+      }
+      {
+        let win = true;
+        for(let i of rowIndex) {
+          if (pattern[i * 3 + i] !== player) {
+            win = false;
+          }
+        }
+        if (win) {
+          // console.log('\\');
+          return true;
+        }
+      }
+      {
+        let win = true;
+        for(let i of rowIndex) {
+          if (pattern[i * 3 + (2 - i)] !== player) {
+            win = false;
+          }
+        }
+        if (win) {
+          // console.log('//');
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function clone(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function willWin(pattern, player) {
+      for (let i of rowIndex) {
+        for (let j of columnIndex) {
+          if (!pattern[i * 3 + j]) {
+            let newPattern = clone(pattern);
+            newPattern[i * 3 + j] = player;
+            if (checkWin(newPattern, player)) {
+              // console.log(i, j);
+              return {i, j};
+            }
+          }
+        }
+      }
+      return null;
+    }
+
+let times = 0;
+    // 实现 AI 的核心代码
+    function bestChoice(pattern, player) {
+      let point;
+      if (point = willWin(pattern, player)) {
+        return {
+          point: point,
+          score: 1
+        }
+      }
+      // 分值设为一个不可能的低分
+      let score = -2;
+      point = null;
+
+      outer: for (let i of rowIndex) {
+        for (let j of columnIndex) {
+          // console.log(i * 3 + j)
+          if (pattern[i * 3 + j]) {
+            continue;
+          }
+          // console.log(times++, pattern);
+          let obj = clone(pattern);
+          obj[i * 3 + j] = player;
+          let r = bestChoice(obj, 3 - player);
+          if (-r.score > score) {
+            score = -r.score;
+            point = {i, j}
+          }
+          if (score === 1) {
+            break outer;
+          }
+        }
+      }
+
+      return {
+        point: point,
+        score: point ? score : 0
+      };
+    }
+
+    show();
+
+  </script>
+</body>
+</html>

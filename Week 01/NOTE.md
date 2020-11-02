@@ -185,3 +185,6 @@ tictactoe-1d.html:177 Uncaught RangeError: Maximum call stack size exceeded
 
 当加入胜利剪枝后，初始运行变为 36000 多次，下一步棋只有 4000 多次，再下一步更少。
 **才九个格子，计算量就如此之大，五子棋肯定不能采用如此暴力的遍历方式了。**
+
+### 使用 Object.create 克隆数据
+好处是 Object.create(obj) 会以 obj 为原型新生成一个对象，原始的数据会保存在新对象的 __proto__ 属性上，新增或修改的属性才会存在对象本身上。当有很多个新对象时，可以节约内存空间。

@@ -21,4 +21,27 @@ contextmenu: 右键弹出菜单事件
 
 quene 是广度优先搜索的关键，如果改为使用 stack 栈存储，则是深度优先搜索。
 
-通过使用不同的存储结构，可以实现不同的搜索方法。 TODO
+通过使用不同的存储结构，可以实现不同的搜索方法。 **TODO**
+
+
+
+## 20201104 [寻路算法可视化和路径显示](./map-editor_02.html)
+思路：过程中通过停顿把搜寻点颜色标出来。
+
+碰到问题：sleep 函数执行一次后就停止，不能继续往下搜索。
+原因：函数 insertPoint 是异步函数，调用时也要加 await，包裹函数需要加 async。至少要在最后一次调用 insertPoint 时加 await。
+
+**async 函数想要同步地调用都需要加 await**
+
+
+- 只搜索上下左右四个点时，得到的路径是直角路线
+- 搜索包括斜向八个点时，路径中会有斜线，路径更短
+
+用异步函数赋值得到的是一个 promise 对象。例如： let path = findPath([10, 10], [20, 19])，path 是一个 promise 对象：
+```
+Promise {<fulfilled>: Array(20)}
+  __proto__: Promise
+  [[PromiseState]]: "fulfilled"
+  [[PromiseResult]]: Array(20)
+```
+

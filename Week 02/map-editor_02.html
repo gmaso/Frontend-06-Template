@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>地图编辑器</title>
+  <style>
+    #container {
+      width: 800px;
+      font-size: 0;
+    }
+    .cell {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      line-height: 7px;
+      margin: 0 1px 1px 0;
+      background-color: grey;
+      vertical-align: top;
+    }
+    .cell.blue {
+      background-color: blue;
+    }
+    .cell.black {
+      background-color: black;
+    }
+    .cell.purple {
+      background-color: purple;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+
+  <button onclick="save()">保存地图</button>
+  <button onclick="empty()">清空地图</button>
+
+  <script>
+    let map = localStorage['map'] ? JSON.parse(localStorage['map']) : Array(10000).fill(0);
+
+    const container = document.getElementById('container');
+    
+    function draw() {
+      container.innerHTML = '';
+      for (let i = 0; i < 100; i += 1) {
+        for (let j = 0; j < 100; j += 1) {
+          let div = document.createElement('div');
+          div.classList.add('cell');
+          div.setAttribute('data-index', j + ',' + i);
+          if (map[i * 100 + j] === 1) {
+            div.classList.add('black');
+          }
+          if (map[i * 100 + j] === 2) {
+            div.classList.add('blue');
+          }
+
+          div.addEventListener('mouseover', () => {
+            if (mouseDown) {
+              if (clear) {
+                div.classList.remove('black');
+                map[i * 100 + j] = 0;
+              } else {
+                div.classList.add('black');
+                map[i * 100 + j] = 1;
+              }
+            }
+          })
+          container.appendChild(div);
+        }
+      }
+    }
+
+    draw();
+
+    let mouseDown = false;
+    let clear = false;
+    container.addEventListener('mousedown', (e) => {
+      mouseDown = true;
+      clear = e.button === 2;
+    });
+    container.addEventListener('mouseup', (e) => {
+      mouseDown = false;
+    });
+    container.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    function save() {
+      localStorage.setItem('map', JSON.stringify(map));
+    }
+
+    function empty() {
+      map = Array(10000).fill(0);
+      draw();
+      localStorage.setItem('map', JSON.stringify(map));
+    }
+
+    let timeout;
+
+    function sleep(time) {
+      return new Promise((resolve, reject) => {
+        setTimeout(resolve, time);
+      });
+    }
+
+
+    // 使用课程里的队列实现
+    async function findPath(start, end) {
+      // 判断边界条件
+
+
+      // 去除旧搜索
+      for (let i = 0; i < 100; i += 1) {
+        for (let j = 0; j < 100; j += 1) {
+          if (map[i * 100 + j] === 2) {
+            map[i * 100 + j] = 0;
+          }
+        }
+      }
+      draw();
+      // 把起点、终点标出来
+      container.children[start[1] * 100 + start[0]].style.backgroundColor = 'red';
+      container.children[end[1] * 100 + end[0]].style.backgroundColor = 'red';
+
+      // 算法关键，使用先进先出的队列，实现广度搜索
+      let quene = [start];
+      let table = Object.create(map).fill(0);
+      let path = [];
+      
+      async function insertPoint(x, y, pre) {
+        // 是否在地图范围内
+        if (x < 0 || x >= 100 || y < 0 || y >= 100) {
+          return false;
+        }
+        // 是否是墙或被搜索过
+        if (map[y * 100 + x]) {
+          return false;
+        }
+        // 标记为搜索过
+        await sleep(16);
+        map[y * 100 + x] = 2;
+        // 使用 table 存储这个点是被那一个点搜索到的。当找到终点后，就可以反向查找出路径
+        table[y * 100 + x] = pre;
+        container.children[y * 100 + x].classList.add('blue');
+        // 队尾新加入点
+        quene.push([x, y]);
+      }
+
+      while(quene.length) {
+        // 队首弹出
+        let [x, y] = quene.shift();
+        // console.log(x, y);
+        if (x === end[0] && y === end[1]) {
+          // 搜索完成，绘制路径
+          path.push([x, y]);
+          container.children[y * 100 + x].classList.add('purple');
+          while(x != start[0] || y != start[1]) {
+            // console.log(x, y);
+            [x, y] = table[y * 100 + x];
+            path.push([x, y]);
+            container.children[y * 100 + x].classList.add('purple');
+          }
+          return path;
+        }
+        await insertPoint(x - 1, y - 1, [x, y]); // 斜向
+        await insertPoint(x, y - 1, [x, y]);
+        await insertPoint(x + 1, y - 1, [x, y]); // 斜向
+        await insertPoint(x - 1, y, [x, y]);
+        await insertPoint(x + 1, y, [x, y]);
+        await insertPoint(x - 1, y + 1, [x, y]); // 斜向
+        await insertPoint(x, y + 1, [x, y]);
+        await insertPoint(x + 1, y + 1, [x, y]); // 斜向
+      }
+      // 未搜索到终点
+      // draw();
+      return null;
+    }
+
+    let path = findPath([10, 10], [20, 19]);
+  </script>
+</body>
+</html>

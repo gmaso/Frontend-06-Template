@@ -135,7 +135,7 @@
       }
     }
 
-    // 使用课程里的队列实现
+    // 使用自定义数据结构实现
     async function findPath(start, end) {
       function inMap(x) {
         return x >= 0 && x < 100;
@@ -181,7 +181,7 @@
           return false;
         }
         // 标记为搜索过
-        await sleep(16);
+        await sleep(5);
         map[y * 100 + x] = 2;
         // 使用 table 存储这个点是被那一个点搜索到的。当找到终点后，就可以反向查找出路径
         table[y * 100 + x] = pre;

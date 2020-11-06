@@ -53,4 +53,12 @@ Promise {<fulfilled>: Array(20)}
 
 1. 方法是比较和终点之间的距离，取离终点最近的点。
   遇到问题：搜索时会和终点错过，从旁边绕 n 多圈。
-  原因：比较点是判断条件错误，this.compare(this.data[i], min) < 0 写成了 this.compare(this.data[i], min)，一直都为真，没起到作用。
+  原因：比较点时判断条件错误，this.compare(this.data[i], min) < 0 写成了 this.compare(this.data[i], min)，一直都为真，没起到作用。
+
+1. 待优化：
+   [ ] 路径获取最短
+   [ ] 换为二叉堆结构
+
+
+## 20201106 学习二叉树、二叉堆
+二叉堆的优势：最大值或最小值位于堆顶，能更快的获取最大最小值。

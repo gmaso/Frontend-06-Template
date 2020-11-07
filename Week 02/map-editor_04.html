@@ -34,6 +34,7 @@
 
   <button onclick="save()">保存地图</button>
   <button onclick="empty()">清空地图</button>
+  <button id="btn">下一个</button>
 
   <script>
     let map = localStorage['map'] ? JSON.parse(localStorage['map']) : Array(10000).fill(0);
@@ -93,19 +94,161 @@
       localStorage.setItem('map', JSON.stringify(map));
     }
 
-    let timeout;
+    let element = document.getElementById('btn');
 
     function sleep(time) {
       return new Promise((resolve, reject) => {
         setTimeout(resolve, time);
+        // element.addEventListener('click', resolve, { once: true });
       });
     }
 
 
-    // 使用课程里的队列实现
-    async function findPath(start, end) {
-      // 判断边界条件
+    // 新增数据结构
+    class Sorted {
+      constructor(data, compare) {
+        this.data = data.slice();
+        this.compare = compare || ((a, b) => a - b);
+      }
+      push(v) {
+        this.data.push(v);
+      }
+      shift() {
+        // 核心，取出一个特定的点
+        if (!this.data.length) {
+          return;
+        }
+        let min = this.data[0];
+        let minIndex = 0;
+        for (let i = 0; i < this.data.length; i += 1) {
+          if (this.compare(this.data[i], min)) {
+            min = this.data[i];
+            minIndex = i;
+          }
+        }
+        this.data[minIndex] = this.data[this.data.length - 1];
+        this.data.pop();
+        // console.log(min);
+        return min;
+      }
+      get length () {
+        return this.data.length;
+      }
+    }
 
+    class Heap {
+      constructor(arr, getLength) {
+        this.data = [...arr];
+        this.length = this.data.length;
+        this.getLength = getLength || Number.MAX_SAFE_INTEGER;
+      }
+
+      isHeap () {
+        const L = Math.floor(this.length / 2);
+        for (let i = L - 1; i >= 0; i -= 1) {
+          // 左右节点
+          const distance = this.data[i][2] || Number.MAX_SAFE_INTEGER;
+          const left = i * 2 + 1 < this.length ? this.data[i * 2 + 1][2] : Number.MAX_SAFE_INTEGER;
+          const right = i * 2 + 2 < this.length ? this.data[i * 2 + 2][2] : Number.MAX_SAFE_INTEGER;
+          if (distance < left && distance < right) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      minHeapify(i) {
+        // i 为当前节点
+        let min = i;
+        if (i >= this.length) {
+          return;
+        }
+
+        // 左右节点
+        const left = i * 2 + 1;
+        const right = i * 2 + 2;
+
+        // 对比左右节点，得到最大节点的序号
+        if ( left < this.length && this.data[left][2] < this.data[min][2]) {
+          min = left;
+        }
+        if (right < this.length && this.data[right][2] < this.data[min][2]) {
+          min = right;
+        }
+        // 如果 i 本身已经是最小，退出操作
+        if (min === i) {
+          return;
+        }
+
+        // 交换最小值与当前值
+        const temp = this.data[i];
+        this.data[i] = this.data[min];
+        this.data[min] = temp;
+        
+        // 递归向下执行
+        return this.minHeapify(min);
+      }
+
+      // 重构堆
+      rebuildHeap() {
+        const L = Math.floor(this.length / 2);
+        // 从下向上循环
+        for (let i = L - 1; i >= 0; i -= 1) {
+          this.minHeapify(i);
+        }
+      }
+
+      sort() {
+        for (let i = this.length - 1; i > 0; i -= 1) {
+          const temp = this.data[0];
+          this.data[0] = this.data[i];
+          this.data[i] = temp;
+          this.length--;
+          this.minHeapify(0);
+        }
+      }
+
+      push(key) {
+        key[2] = this.getLength(key);
+        this.data[this.length] = key;
+        this.length++;
+        if (this.isHeap()) {
+          return;
+        }
+        this.rebuildHeap();
+      }
+
+      delete(index) {
+        if (index >= this.length) {
+          return;
+        }
+        this.data.splice(index, 1);
+        this.length--;
+        if (this.isHeap()) {
+          return;
+        }
+        this.rebuildHeap();
+      }
+
+      shift() {
+        const temp = this.data[0];
+        this.delete(0);
+        // console.log(temp)
+        return temp;
+      }
+    }
+
+    // 使用自定义数据结构实现
+    async function findPath(start, end) {
+      function inMap(x) {
+        return x >= 0 && x < 100;
+      }
+
+      // 判断边界条件
+      if (!inMap(start[0]) || !inMap(start[1]) || !inMap(end[0]) || !inMap(end[1])) {
+        alert('起点或终点不在地图中，没有路径可达。');
+        return false;
+      }
 
       // 去除旧搜索
       for (let i = 0; i < 100; i += 1) {
@@ -120,8 +263,21 @@
       container.children[start[1] * 100 + start[0]].style.backgroundColor = 'red';
       container.children[end[1] * 100 + end[0]].style.backgroundColor = 'red';
 
+      function distance(a) {
+        if (!a) {
+          return Number.MAX_SAFE_INTEGER;
+        }
+        return (a[0] - end[0]) ** 2 + (a[1] - end[1]) ** 2;
+      }
+
       // 算法关键，使用先进先出的队列，实现广度搜索
-      let quene = [start];
+      // let quene = new Sorted([start], (a, b) => {
+      //   return distance(a) - distance(b) < 0;
+      // });
+      // 使用二叉堆结构
+      quene = new Heap([start], (a) => {
+        return distance(a);
+      });
       let table = Object.create(map).fill(0);
       let path = [];
       
@@ -135,7 +291,7 @@
           return false;
         }
         // 标记为搜索过
-        await sleep(16);
+        await sleep(5);
         map[y * 100 + x] = 2;
         // 使用 table 存储这个点是被那一个点搜索到的。当找到终点后，就可以反向查找出路径
         table[y * 100 + x] = pre;
@@ -174,7 +330,12 @@
       return null;
     }
 
-    let path = findPath([10, 10], [50, 50]);
+
+    (async function() {
+      console.time('find')
+    let path = await findPath([10, 10], [50, 50]);
+    console.timeEnd('find')
+    }());
   </script>
 </body>
 </html>

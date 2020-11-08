@@ -145,12 +145,12 @@
 
       isHeap () {
         const L = Math.floor(this.length / 2);
-        for (let i = L - 1; i >= 0; i -= 1) {
+        for (let i = L; i >= 0; i -= 1) {
           // 左右节点
-          const distance = this.data[i][2] || Number.MAX_SAFE_INTEGER;
+          const current = this.data[i] && this.data[i][2] || Number.MAX_SAFE_INTEGER;
           const left = i * 2 + 1 < this.length ? this.data[i * 2 + 1][2] : Number.MAX_SAFE_INTEGER;
           const right = i * 2 + 2 < this.length ? this.data[i * 2 + 2][2] : Number.MAX_SAFE_INTEGER;
-          if (distance < left && distance < right) {
+          if (current > left || current > right) {
             return false;
           }
         }
@@ -167,12 +167,16 @@
         // 左右节点
         const left = i * 2 + 1;
         const right = i * 2 + 2;
+        
+        const currentV = this.data[i][2] || Number.MAX_SAFE_INTEGER;
+        const leftV = left < this.length ? this.data[left][2] : Number.MAX_SAFE_INTEGER;
+        const rightV = right < this.length ? this.data[right][2] : Number.MAX_SAFE_INTEGER;
 
-        // 对比左右节点，得到最大节点的序号
-        if ( left < this.length && this.data[left][2] < this.data[min][2]) {
+        // 对比左右节点，得到最小节点的序号
+        if ( leftV <= rightV && leftV < currentV) {
           min = left;
         }
-        if (right < this.length && this.data[right][2] < this.data[min][2]) {
+        if (rightV < leftV && rightV < currentV) {
           min = right;
         }
         // 如果 i 本身已经是最小，退出操作
@@ -193,7 +197,7 @@
       rebuildHeap() {
         const L = Math.floor(this.length / 2);
         // 从下向上循环
-        for (let i = L - 1; i >= 0; i -= 1) {
+        for (let i = L; i >= 0; i -= 1) {
           this.minHeapify(i);
         }
       }
@@ -275,7 +279,7 @@
       //   return distance(a) - distance(b) < 0;
       // });
       // 使用二叉堆结构
-      quene = new Heap([start], (a) => {
+      let quene = new Heap([start], (a) => {
         return distance(a);
       });
       let table = Object.create(map).fill(0);
@@ -331,11 +335,15 @@
     }
 
 
-    (async function() {
+    async function find(start, end) {
       console.time('find')
-    let path = await findPath([10, 10], [50, 50]);
-    console.timeEnd('find')
-    }());
+      let path = await findPath(start, end);
+      console.timeEnd('find')
+      console.log(path ? path.length : 0);
+      return path;
+    }
+
+    find([10, 10], [50, 50]);
   </script>
 </body>
 </html>

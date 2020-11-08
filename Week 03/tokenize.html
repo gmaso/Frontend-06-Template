@@ -11,23 +11,42 @@
     let regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)/g;
     let dict = ['number', 'whitespace', 'lineTerminator', '*', '/', '+', '-'];
 
-    function tokenize(string) {
+    function* tokenize(string) {
       let result = null;
+      let lastIndex = 0;
       while(true) {
+        lastIndex = regexp.lastIndex;
         result = regexp.exec(string);
         if (!result) {
           break;
         }
+        // 判断上次解析到的位置和最新匹配到位置中间的字符长度是否等于匹配出来的字符长度，
+        // 如果不是，则说明有未匹配的字符，提示后跳出
+        if (regexp.lastIndex - lastIndex > result[0].length) {
+          console.log('存在不识别的字符');
+          break;
+        }
+        let token = {
+          type: null,
+          value: null
+        };
         for (let i = 1; i <= dict.length; i += 1) {
           if (result[i]) {
-            console.log(dict[i - 1]);
+            token.type = dict[i - 1];
           }
         }
-        console.log(result);
+        token.value = result[0];
+        yield token;
+      }
+      yield {
+        type: 'EOF'
       }
     }
 
-    tokenize('1024 + 10 * 25');
+    for (let token of tokenize(`1024   + 10  *
+     25 / 2 - 5`)) {
+      console.log(token);
+    }
   </script>
 </body>
 </html>

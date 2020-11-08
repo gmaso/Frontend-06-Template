@@ -282,21 +282,20 @@
       let quene = new Heap([start], (a) => {
         return distance(a);
       });
-      let table = Object.create(map).fill(0);
+      let table = Object.create(map);
       let path = [];
       
       async function insertPoint(x, y, pre) {
         // 是否在地图范围内
         if (x < 0 || x >= 100 || y < 0 || y >= 100) {
-          return false;
+          return;
         }
         // 是否是墙或被搜索过
-        if (map[y * 100 + x]) {
-          return false;
+        if (table[y * 100 + x]) {
+          return;
         }
         // 标记为搜索过
         await sleep(5);
-        map[y * 100 + x] = 2;
         // 使用 table 存储这个点是被那一个点搜索到的。当找到终点后，就可以反向查找出路径
         table[y * 100 + x] = pre;
         container.children[y * 100 + x].classList.add('blue');

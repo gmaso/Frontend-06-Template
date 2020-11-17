@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+  <script>
+
+    class Trie {
+      constructor() {
+        this.dict = {}
+      }
+
+      push(string) {
+        let str = string + '';
+        let node = this.dict;
+        for (let s of str) {
+          if (!node[s]) {
+            node[s] = {};
+          }
+          node = node[s];
+        }
+        node['count'] = node['count'] ? node['count'] + 1 : 1;
+      }
+
+      getMost() {
+        let max = 0;
+        let str = '';
+        let count = [];
+        let visit = (node, word) => {
+          node.count && count.push(+node.count);
+          // console.log(node, word, max);
+          if (node.count && node.count > max) {
+            max = node.count;
+            str = word;
+          }
+          for (let p in node) {
+            if (p === 'count') {
+              continue;
+            }
+            visit(node[p], word + p)
+          }
+        }
+        visit(this.dict, '');
+        console.log(max, str);
+        console.log(count.sort((a, b) => a - b).reverse());
+      }
+    }
+
+    const tree = new Trie();
+    
+    function pushRandom() {
+      let len = Math.ceil(Math.random() * 8);
+      let str = '';
+      for (let i = 0; i < len; i++) {
+        str += String.fromCharCode(Math.floor(Math.random() * 26) + 97);
+      }
+      // console.log(str);
+      return str;
+    }
+
+    for (let i = 0; i < 50000; i++) {
+      tree.push(pushRandom());
+    }
+
+    tree.getMost();
+  </script>
+</body>
+</html>

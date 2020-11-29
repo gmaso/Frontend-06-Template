@@ -1,11 +1,11 @@
 # 第五周学习笔记
 
 ## 作业代码
-### [Reactive 实现原理（一）](./proxy_01.html)
-### [Reactive 实现原理（二）](./proxy_02.html)
+### 1. [Reactive 实现原理（一）](./proxy_01.html)
+### 2. [Reactive 实现原理（二）](./proxy_02.html)
    
    问题：由于每次操作都会触发所有 callbacks 的调用，导致性能问题和多余的操作。
-### [Reactive 实现原理（三）](./proxy_03_b.html)
+### 3. [Reactive 实现原理（三）](./proxy_03_b.html)
 
    优化上一步中的性能问题。实现只在对应的对象和属性上，才触发 callback。
    
@@ -20,16 +20,16 @@
 2. 回调直接保存为 callback，只能有一个回调。
 
 
-一、 实现二
+二、 实现二
 
 使用对象和属性分层保存依赖，且把回调保存为数组。
 
-### [优化 reactive](./proxy_04.html)
+### 4. [优化 reactive](./proxy_04.html)
 处理嵌套的对象。
 
 技巧：使用一个全局 Map 对象来存储所有 proxy 的实例，以目标对象作为键值，既是缓存，也防止生成重复代理。
 
-### [reactivity 响应式对象](./proxy_05.html)
+### 5. [reactivity 响应式对象](./proxy_05.html)
 reactivity 提供半成品的双向绑定，负责数据到 DOM 的监听。
 
 技巧：**把 effect 拆开写**。把依赖对象和属性的每个改变，放入单独的 effect 中，可以减少数据改变时的 DOM 操作。
@@ -58,18 +58,17 @@ effect(() => {
 
 ```
 
-### [使用 Range 实现 DOM 精确操作 | 基本拖拽](./range_01.html)
+### 6. [使用 Range 实现 DOM 精确操作 | 基本拖拽](./range_01.html)
 实现任意位置的拖拽。
 
 重点：mousemove 时间必须添加到 document 上。
 
+### 7. [使用 Range 实现 DOM 精确操作 | 精确拖拽](./range_02.html)
+实现插入正常流排版的拖拽。认识 DOM API Range 与 CSSOM 的应用。
 
+由于文字没有分节点，必须要使用 range 产生可以插入的空位。然后判断与鼠标位置最近的 range，把滑块放入该 range。
 
-
-### [使用 Range 实现 DOM 精确操作 | 精确拖拽](./range_01.html)
-实现插入正常流排版的拖拽。
-
-
+---
 ## 20201127 Proxy 与 Reflect
 ### 介绍
 代理与反射是 ES6 新增的能力，可以让开发者拦截并向基本操作嵌入额外行为。

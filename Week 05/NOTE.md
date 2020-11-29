@@ -58,6 +58,17 @@ effect(() => {
 
 ```
 
+### [使用 Range 实现 DOM 精确操作 | 基本拖拽](./range_01.html)
+实现任意位置的拖拽。
+
+重点：mousemove 时间必须添加到 document 上。
+
+
+
+
+### [使用 Range 实现 DOM 精确操作 | 精确拖拽](./range_01.html)
+实现插入正常流排版的拖拽。
+
 
 ## 20201127 Proxy 与 Reflect
 ### 介绍

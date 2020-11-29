@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="draggable" style="width: 100px;height: 100px;background-color: purple;"></div>
+  <script>
+    let draggable = document.getElementById('draggable');
+
+    // 保存滑块初始位置
+    let baseX = 0;
+    let baseY = 0;
+
+    draggable.addEventListener('mousedown', event => {
+      // 保存鼠标在滑块上的位置
+      let startX = event.clientX;
+      let startY = event.clientY;
+
+      let up = event => {
+        baseX = baseX + event.clientX - startX;
+        baseY = baseY + event.clientY - startY;
+        document.removeEventListener('mousemove', move);
+        document.removeEventListener('mouseup', up);
+      };
+
+      let move = event => {
+        draggable.style.transform = `translate(${ baseX + event.clientX - startX }px, ${ baseY + event.clientY - startY }px)`;
+      };
+
+      // mousemove 事件必须加到 document 上，才能在鼠标滑动出滑块范围或超出页面范围时触发
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', up);
+    });
+  </script>
+</body>
+</html>

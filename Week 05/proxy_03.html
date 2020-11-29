@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    const callbacks = new Map();
+
+    let usedReactivities = [];
+
+    let object = {
+      a: 1,
+      b: 2
+    };
+
+    function effect(callback) {
+      // callbacks.push(callback);
+      usedReactivities = [];
+      callback();
+
+      console.log(usedReactivities);
+       for (let reactivity of usedReactivities) {
+         if (!callbacks.has(reactivity)) {
+           callbacks.set(reactivity, callback);
+         }
+       }
+    }
+
+    function reactive(obj) {
+      return new Proxy(obj, {
+        set(target, prop, val) {
+          let result = Reflect.set(...arguments);
+          usedReactivities.forEach((reactivity) => {
+            if (reactivity[0] === target && reactivity[1] === prop && callbacks.get(reactivity)) {
+              callbacks.get(reactivity)();
+            }
+          });
+          return result;
+        },
+        get(target, prop) {
+          usedReactivities.push([target, prop]);
+          let result = Reflect.get(...arguments);
+          return result;
+        }
+      });
+    }
+
+    let po = reactive(object);
+
+    effect(() => {
+      console.log(po.a);
+    });
+    effect(() => {
+      console.log(po.a, 'sss');
+    });
+
+  </script>
+</body>
+</html>

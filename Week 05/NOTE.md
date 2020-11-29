@@ -1,5 +1,64 @@
 # 第五周学习笔记
 
+## 作业代码
+### [Reactive 实现原理（一）](./proxy_01.html)
+### [Reactive 实现原理（二）](./proxy_02.html)
+   
+   问题：由于每次操作都会触发所有 callbacks 的调用，导致性能问题和多余的操作。
+### [Reactive 实现原理（三）](./proxy_03_b.html)
+
+   优化上一步中的性能问题。实现只在对应的对象和属性上，才触发 callback。
+   
+   建立 reactive 和 effect 中间的连接。通过调用 callback 函数，然后在代理对象上监控到访问，从而建立对象属性和 callback 的关系。
+
+一、 实现一
+
+使用 callbacks.set(reactivity, callback) 保存依赖，reactivity 结构为 [obj, prop]。
+
+存在问题：
+1. 使用 reactivity 做为键值保存回调，触发时需要循环所有元素判断对象和属性，性能差。
+2. 回调直接保存为 callback，只能有一个回调。
+
+
+一、 实现二
+
+使用对象和属性分层保存依赖，且把回调保存为数组。
+
+### [优化 reactive](./proxy_04.html)
+处理嵌套的对象。
+
+技巧：使用一个全局 Map 对象来存储所有 proxy 的实例，以目标对象作为键值，既是缓存，也防止生成重复代理。
+
+### [reactivity 响应式对象](./proxy_05.html)
+reactivity 提供半成品的双向绑定，负责数据到 DOM 的监听。
+
+技巧：**把 effect 拆开写**。把依赖对象和属性的每个改变，放入单独的 effect 中，可以减少数据改变时的 DOM 操作。
+```JavaScript
+// good 每个数据的改变，只会触发相应的 DOM 操作
+effect(() => {
+  document.getElementById('r').value = po.r;
+});
+effect(() => {
+  document.getElementById('g').value = po.g;
+});
+effect(() => {
+  document.getElementById('b').value = po.b;
+});
+effect(() => {
+  document.getElementById('color').style.backgroundColor = `rgb(${po.r},${po.g},${po.b})`;
+});
+
+// bad 任何数据的改变，都会触发所有的 DOM 操作
+effect(() => {
+  document.getElementById('r').value = po.r;
+  document.getElementById('g').value = po.g;
+  document.getElementById('b').value = po.b;
+  document.getElementById('color').style.backgroundColor = `rgb(${po.r},${po.g},${po.b})`;
+});
+
+```
+
+
 ## 20201127 Proxy 与 Reflect
 ### 介绍
 代理与反射是 ES6 新增的能力，可以让开发者拦截并向基本操作嵌入额外行为。
@@ -156,3 +215,22 @@ proxy.foo; // Uncaught TypeError: Cannot perform 'get' on a proxy that has been 
 12. apply(target, thisArg, ...argumentsList)
 13. construct(target, argumentsList, newTarget)
 
+## 代理模式
+使用代理可以在代码中实现一些有用的编程模式。
+
+1. 跟踪属性访问：捕获 get、set、has 等操作，跟踪属性什么时候被访问、被查询。
+2. 隐藏属性：捕获 get、has 操作，隐藏目标对象上的属性。
+3. 属性验证：捕获 set 操作，根据赋的值，决定是否允许赋值。
+4. 函数与构造函数参数验证：捕获 apply、construct 操作，判断函数调用和实例化时的参数。
+5. 数据绑定与可观察对象：通过代理可以把运行时中原本不相干的部分联系到一起。这样就可以实现各种模式，让不同的代码互操作。（**实现依赖的收集与分派。**）
+
+## 小结
+代理是 ES6 新增的令人兴奋和动态十足的新特性，尽管不支持向后兼容，但它开辟了一片前所未有的 JavaScript 元编程及抽象的新天地。
+
+代理是真实 JavaScript 对象的透明抽象层，可以定义捕获器来拦截和操作对象的绝大部分基本操作和方法，前提是遵循捕获器不变式。
+
+反射 API 封装了一整套与捕获器拦截的操作相应的方法。可以把反射 API 方法看作一套基本操作，这些操作是绝大部分 JavaScript 对象 API 的基础。
+
+代理的应用场景是不可限量的。Vue 3.0 响应式的基础就是代理。
+
+代理提供了对 ECMAScript 语言本身行为的修改，元编程🐂。

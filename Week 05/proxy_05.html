@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <input type="range" id="r" min="0" max="255" step="1">
+  <input type="range" id="g" min="0" max="255" step="1">
+  <input type="range" id="b" min="0" max="255" step="1">
+  <div id="color" style="width: 100px;height: 100px;"></div>
+  <script>
+    const callbacks = new Map();
+    // 保存所有的 proxy 示例，使用目标对象作为键值，保证每个目标对象唯一对应一个 proxy
+    let reactivities = new Map();
+    let usedReactivities = [];
+
+    let object = {
+      r: 0,
+      g: 0,
+      b: 0
+    };
+
+    function effect(callback) {
+      // 收集本次 callback 中依赖的对象和属性
+      usedReactivities = [];
+      callback();
+
+      console.log(usedReactivities);
+       for (let reactivity of usedReactivities) {
+         if (!callbacks.has(reactivity[0])) {
+           callbacks.set(reactivity[0], new Map());
+         }
+         if (!callbacks.get(reactivity[0]).has(reactivity[1])) {
+          callbacks.get(reactivity[0]).set(reactivity[1], []);
+         }
+         callbacks.get(reactivity[0]).get(reactivity[1]).push(callback);
+       }
+    }
+
+    function reactive(obj) {
+      if (reactivities.has(obj)) {
+        return reactivities.get(obj);
+      }
+      let proxy = new Proxy(obj, {
+        set(target, prop, val) {
+          let result = Reflect.set(...arguments);
+          if (callbacks.has(target) && callbacks.get(target).has(prop)) {
+            for (let callback of callbacks.get(target).get(prop)) {
+              callback();
+            }
+          }
+          return result;
+        },
+        get(target, prop) {
+          usedReactivities.push([target, prop]);
+          if (typeof target[prop] === 'object') {
+            return reactive(target[prop]);
+          }
+          let result = Reflect.get(...arguments);
+          return result;
+        }
+      });
+      reactivities.set(obj, proxy);
+      return proxy;
+    }
+
+    let po = reactive(object);
+
+    // 数据到 DOM 的绑定
+    // 任何依赖对象和属性的改变，都可以放到 effect 中
+    // 把每个改变放入到单独的 effect 中，可以在发生改变时，减少执行的 DOM 操作
+    // 如果把所有改变放入到一个 effect 中，则其中任何一个改变，都会执行所有的 DOM 操作，效率比较低
+    effect(() => {
+      document.getElementById('r').value = po.r;
+    });
+    effect(() => {
+      document.getElementById('g').value = po.g;
+    });
+    effect(() => {
+      document.getElementById('b').value = po.b;
+    });
+    effect(() => {
+      document.getElementById('color').style.backgroundColor = `rgb(${po.r},${po.g},${po.b})`;
+    });
+
+    // DOM 到数据的绑定
+    document.getElementById('r').addEventListener('input', function(e) {
+      po.r = e.target.value;
+    });
+    document.getElementById('g').addEventListener('input', function(e) {
+      po.g = e.target.value;
+    });
+    document.getElementById('b').addEventListener('input', function(e) {
+      po.b = e.target.value;
+    });
+
+  </script>
+</body>
+</html>

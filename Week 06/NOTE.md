@@ -159,9 +159,76 @@ TODO：尽可能分类能找到的编程语言
 
 ## 20201203 JavaScript 类型
 
+### Atom
+
+Grammar
+
+- Literal
+- Variable
+- Keywords
+- Whitespace
+- Line Terminator
+
+Runtime
+
+- Types
+- Execution Context
 
 
 
+JavaScript 类型：
+
+- **Number**
+- **String**
+- **Boolean**
+- **Object**
+- **Null**
+- undefined
+- Symbol
+
+JavaScript 中的七种类型，常用前面五种。undefined 用于检测是否被定义，不要用于赋值。Symbol 用于作为属性名。
+
+### Number
+
+JavaScript 中的 Number 使用 IEEE 754 双精度表示法，1 位符号 + 11 位指数 + 52 位有效位数。表示越大的数，能表示的精度就越稀疏。11 位指数是以一个基准值来计算的。52 位有效位数前有一个隐藏位，值为 1。
+
+TODO 查看数字的真实二进制表示
+
+进度损失从十进制转换成二进制时就参数了，每次操作可能产生 1e 的损失。
+
+Number 字面量表示有 十进制（整数、小数、科学记数法）、二进制（0b 开头）、八进制（0o 开头）、十六进制（0x 开头）。注意：数字后跟 . 时，. 会被作为小数点被数字吞掉，所以要取属性时需要注意词法：0 .toString()，中间留一个空格。
+
+### String
+
+- Character 字符，直观的形象
+- Code Point 码点，字符的二进制表示
+- Encoding 编码，码点的存储形式
+
+##### 编码标准
+
+ASCII、Unicode、UCS（Unicode Character Set，UCS-2 为 0000 到 FFFF，两个字节表示）、GB2312、GBK（GB13000）、GB18030、ISO-8859（东欧编码的一系列标准）、BIG5（台湾大五码）
+
+大部分编码都兼容 ASCII 编码，但大都不互相兼容。GB、8859 系列、BIG5 都是各个国家地区的编码，且互相不兼容，所以系统或软件会要求选择语言或编码，免得用错编码取不出正确的字符😂。
+
+![image-20201203223541809](http://static.gmaso.cn/blog/2020/12/03/22/20023f9bff77ea1b66f007a7e1c85af7-0e478f-image-20201203223541809.png?imageslim)
+
+黄色的为 UTF8 中的控制位，第一个字节中的控制位中 1 的个数表示全部有几个字节，后续的字节都用 10 开头。
+
+TODO 编码与字符集的概念区别？
+
+字符集就是字符的集合。
+
+编码是对字符集的一个表示。对字符集的不同编码方式就产生了不同的编码方法，比如 UTF-8、GBK。使用 Unicode 编码规则出来的字符的集合称为 Unicode 字符集。
+
+TODO 用 js 函数把 string 进行编码
+
+#### String - Grammar
+
+表示方法：单引号、双引号、反引号、反斜杠转义
+
+![image-20201203230354593](http://static.gmaso.cn/blog/2020/12/03/23/381aaf60a21328a52fc4490d20e95fc3-df6ff2-image-20201203230354593.png?imageslim)
+
+对于反引号的字符模板，实际解析时，是如上图，下边的 3 个是解析出来的 token，剩余的变量实际是直接在代码中。看起来被大括号括起来的变量实际上是没被包含的。
 
 ## 20201204 JavaScript 对象
 

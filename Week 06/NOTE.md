@@ -206,7 +206,7 @@ Number 字面量表示有 十进制（整数、小数、科学记数法）、二
 
 ##### 编码标准
 
-ASCII、Unicode、UCS（Unicode Character Set，UCS-2 为 0000 到 FFFF，两个字节表示）、GB2312、GBK（GB13000）、GB18030、ISO-8859（东欧编码的一系列标准）、BIG5（台湾大五码）
+ASCII、Unicode、UCS（Unicode Character Set，UCS-2 为 0000 到 FFFF，两个字节表示）、GB2312（GB/T 2312-80，收字 7445 个）、GBK（汉字内码扩展规范，不是国家标准，收字 21886 个，兼容 GB2312，并收录 GB13000 的全部字符。GB13000 等同 ISO/IEC 10646）、GB18030（GB18030-2005，收字 70244 个，兼容 GB2312 和 GBK，为中国境内软件支持的中文编码字符集**强制性标准**）、ISO-8859（东欧编码的一系列标准）、BIG5（台湾大五码）
 
 大部分编码都兼容 ASCII 编码，但大都不互相兼容。GB、8859 系列、BIG5 都是各个国家地区的编码，且互相不兼容，所以系统或软件会要求选择语言或编码，免得用错编码取不出正确的字符😂。
 
@@ -216,9 +216,11 @@ ASCII、Unicode、UCS（Unicode Character Set，UCS-2 为 0000 到 FFFF，两个
 
 TODO 编码与字符集的概念区别？
 
-字符集就是字符的集合。
+字符（Character）是各种文字和符合的总称，包括各国家文字、标点符号、图形符号、数字等。字符集（Character set）就是字符的集合，与计算机无关。
 
-编码是对字符集的一个表示。对字符集的不同编码方式就产生了不同的编码方法，比如 UTF-8、GBK。使用 Unicode 编码规则出来的字符的集合称为 Unicode 字符集。
+编码是对字符的计算机表示，从字符映射到字节。对字符的不同编码方式就产生了不同的编码方案标准，比如 UTF-8、GBK。不同编码方案标准中包含的字符个数不同，产生了不同的字符集。使用 Unicode 编码规则出来的字符的集合称为 Unicode 字符集。此外，还有 ASCII 字符集、GB2312 字符集、BIG5 字符集等。
+
+[常见乱码问题分析和总结 - IBM Developer](https://developer.ibm.com/zh/articles/analysis-and-summary-of-common-random-code-problems/)
 
 TODO 用 js 函数把 string 进行编码
 

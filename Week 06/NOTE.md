@@ -2,19 +2,50 @@
 
 ## 20201201 JavaScript 语言通识
 
-语言按语法分类：
+#### 语言按语法分类：
 
 - 非形式语言：中文、英文等日常使用语言，比较自由，没有固定形式，语法没有严格的定义
 - 形式语言：大部分计算机语言，语法有严格的定义
 
+编程语言的描述一般可以分为**语法**和**语义**。语法是说明编程语言中，哪些符号或文字的组合方式是正确的，语义则是对于编程的解释。
+
+在数学、逻辑和计算机科学中，**形式语言**（Formal language）是用精确的数学或机器可处理的公式定义的语言。形式语言一般有两个方面：语法和语义。专门研究语言的语法的数学和计算机科学分支叫做**形式语言理论**，它只研究语言的语法而不致力于它的语义。
+
+在形式语言理论中，**文法**（为避免歧义，常称作“形式文法”）是形式语言中字符串的一套产生式规则。这些规则描述了如何用语言的字母表生成符合语法的有效的字符串。文法不描述字符串的含义，也不描述在任何上下文中可以用它们做什么 -- 只描述它们的形式。
+
+**形式语言理论**是应用数学的一个分支，是研究形式文法和语言的学科。
+
+#### 形式语言的表示方法
+
+不像自然语言，一个形式语言作为一个集合，需要有某种明确的标准来定义一个字符串是否是它的元素。可以有多种方法来定义：
+
+- 枚举法：如果一个形式语言的元素数目是有限的，可以通过枚举它的各个字符串来严格地定义它。
+- 形式文法：常见乔姆斯基谱系。
+- 正则表达式：在形式语言领域内对应于正则语言。形式语言中的正则表达式和一般编程语言中所称的正则表达式在语法上有较大差异。
+- 状态机：消耗输入符号，并在自身的不同状态间切换。
 
 
-### 形式语言的分类（乔姆斯基谱系：根据文法的复杂程度）：
 
-- 0 型 无限制文法：包括所有的文法（1、2、3 型）
+### 形式语言的分类（乔姆斯基谱系：根据文法的复杂程度）
+
+乔姆斯基谱系是计算机科学中刻画形式文法表达能力的一个分类谱系，有语言学家诺姆·乔姆斯基于 1956 年提出。它包括四个层次：
+
+- 0 型 无限制文法：包括所有的文法（1、2、3 型），能够产生所有可被图灵机识别的语言，又称为递归可枚举语言
 - 1 型 上下文相关文法：生成上下文相关语言（包括 2、3 型）
 - 2 型 上下文无关文法：生成上下文无关语言（包括 3 型）
 - 3 型 正则文法（正规文法 regular form）：生成正则语言
+
+![image-20201206174254843](http://static.gmaso.cn/blog/2020/12/06/17/df4b7455a508317c2ba9d2827a6071f4-2abaf9-image-20201206174254843.png?imageslim)
+
+##### BNF（巴科斯范式）
+
+巴科斯范式（Backus Normal Form，缩写为 BNF），又称为**巴科斯-诺尔范式**（Backus-Naur Form），是一种用于表示上下文无关文法的语言，是由 John Backus 和 Peter Naur 首先引入的用来描述计算机语言语法的符号集。
+
+尽管 BNF 也能表示一部分自然语言的语法，它还是更广泛地使用于程序设计语言、指令集、通信协议的语法表示中。
+
+##### 产生式
+
+在计算机中指- Tiger 编译器将源程序经过词法分析（Lexical Analysis）和语法分析（Syntax Analysis）后得到的一系列符合文法规则（BNF）的语句。
 
 
 
@@ -46,17 +77,39 @@ BNF：
 
 ​			\<MultiplicativeExpression>"*"\<Number>|
 
-​			\<MultiplicativeExpression>"/"\<Number>|
+​			\<MultiplicativeExpression>"/"\<Number>
 
 ​	\<AddtiveExpression> :== \<MultiplicativeExpression> |
 
 ​			\<AddtiveExpression>"+"\<MultiplicativeExpression>|
 
-​			\<AddtiveExpression>"-"\<MultiplicativeExpression>|
-
-​	\<BracketExpression> :== "("\<AddtiveExpression>")" |
+​			\<AddtiveExpression>"-"\<MultiplicativeExpression>
 
 ##### TODO 习题：带问号的四则运算产生式
+
+四则运算： (1 + 2) * 3
+
+终结符：Number + - * / ( )
+
+非终结符：MultiplicativeExpression、AddtiveExpression、BracketExpression
+
+BNF：
+
+​	\<MultiplicativeExpression> :== \<BracketExpression> |
+
+​			\<MultiplicativeExpression>"*"\<BracketExpression>|
+
+​			\<MultiplicativeExpression>"/"\<BracketExpression>
+
+​	\<AddtiveExpression> :== \<MultiplicativeExpression> |
+
+​			\<AddtiveExpression>"+"\<MultiplicativeExpression>|
+
+​			\<AddtiveExpression>"-"\<MultiplicativeExpression>
+
+​	\<BracketExpression> :== \<Number> |
+
+​			"("\<AddtiveExpression>")"
 
 
 
@@ -72,7 +125,7 @@ BNF：
 
 - 2 型 \<A> :== ?
 
-  左边只能有一个非终结符，右边没有限制
+  左边只能包含一个符号，并且该符号为非终结符，右边没有限制
 
 - 3 型 \<A> :== \<A>?
 
@@ -95,18 +148,68 @@ EBNF、ABNF 对 BNF 语法进行了扩展。
 
 更常见的是，每个语言的标准里都自定义了产生式的书写方式。
 
+
+
 ### 现代语言的分类
 
 其他分类方法
 
 - 形式语言 - 用途
   - 数据描述语言：JSON、HTML、XAML、SQL、CSS
-  - 编程语言：C、C++、Java 等
+  - 编程语言：C、C++、Java 等大部分语言
 - 形式语言 - 表达方式
-  - 声明式语言：结果是什么样的，主要是函数式语言
-  - 命令型语言：步骤是什么样的
+  - 声明式语言：描述目标的性质，让电脑明白结果是什么样的，而非流程。主要是函数式语言
+  - 命令型语言：明确指出步骤是什么样的
+
+
 
 TODO：尽可能分类能找到的编程语言
+
+##### 声明式语言
+
+- 约束式编程
+
+- 领域专属语言（DSL）
+
+  yacc 语法分析器、Make 编译说明语言、Puppet 管理配置语言、正则表达式、SQL（SQL、XQuery）、很多文本标记语言（如 HTML、MXML、XAML、XSLT）
+
+- 逻辑式编程
+
+  Prolog（创建在逻辑学的理论基础之上， 最初被运用于自然语言等研究领域。现在已广泛的应用在人工智能的研究中，它可以用来建造专家系统、自然语言理解、智能知识库等）、Curry（基于 Haskell，在许多层面可以被视为是 Haskell 的超集）、Datalog（一种数据查询语言）
+
+- 函数式编程
+
+  （Lisp、Common Lisp、Emacs Lisp、Scheme、Racket、Clojure、ML、OCaml、Standard ML、Unlambda、F#、Haskell）、JavaScript
+
+- 组态管理系统
+
+声明式编程通常被看做是形式逻辑的理论，把计算看做推导。通常用作解决人工智能和约束满足问题。因大幅简化了并行计算的编写难度，自 2009 年起备受关注。
+
+##### 命令式语言
+
+大部分编程语言都是命令式的。
+
+- 结构化 - 过程式
+
+  Ada、BASIC、Fortran、C、Pascal、Go、JavaScript
+
+- 结构化- 面向对象
+
+  Smalltalk、Java、C#、Objective-C、C++、Eiffel、Python、Ruby、Rust、Swift
+
+- 非结构化
+
+  COBOL、SNOBOL
+
+
+
+##### 更多资料参考
+
+[编程语言列表 - wikipedia](https://zh.wikipedia.org/wiki/%E7%BC%96%E7%A8%8B%E8%AF%AD%E8%A8%80%E5%88%97%E8%A1%A8)
+
+[Comparison of multi-paradigm programming languages - wikipedia](https://en.wikipedia.org/wiki/Comparison_of_multi-paradigm_programming_languages)
+
+
 
 
 
@@ -240,7 +343,7 @@ undefined 不是关键字，可以重新赋值，但强烈不建议这么用。�
 ## 20201204 JavaScript 对象
 
 ### Object
-对象的：identifier、state、behavior
+对象的三种性质：identifier、state、behavior
 在设计对象的状态和行为时，我们总是遵循“行为改变状态”的原则。
 
 #### class

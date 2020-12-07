@@ -142,6 +142,16 @@ BNF：
 - Python 中，行首的 tab 符和空格会根据上一行的行首空白以一定的规则被处理成虚拟终结符 indent 或者 dedent
 - JavaScript 中，/ 可能是除号，也可能是正则表达式开头；字符串模板中需要特殊处理 }；还有自动插入分号规则。
 
+##### HTML 的文法
+
+> 所有的常规解析器都不适用于 HTML（我并不是开玩笑，它们可以用于解析 CSS 和 JavaScript）。HTML 并不能很容易地用解析器所需的与上下文无关的语法来定义。
+>
+> 有一种可以定义 HTML 的正规格式：DTD（Document Type Definition，文档类型定义），但它不是与上下文无关的语法。
+
+DTD 就是 HTML 的文法定义。XML 有很多解析器可以使用，但 HTML 由于对文法的处理更为“宽容”，导致不再是上下文无关文法。
+
+
+
 ### 不同的产生式类型
 
 EBNF、ABNF 对 BNF 语法进行了扩展。
@@ -163,7 +173,7 @@ EBNF、ABNF 对 BNF 语法进行了扩展。
 
 
 
-TODO：尽可能分类能找到的编程语言
+尽可能分类能找到的编程语言
 
 ##### 声明式语言
 
@@ -313,11 +323,55 @@ ASCII、Unicode、UCS（Unicode Character Set，UCS-2 为 0000 到 FFFF，两个
 
 大部分编码都兼容 ASCII 编码，但大都不互相兼容。GB、8859 系列、BIG5 都是各个国家地区的编码，且互相不兼容，所以系统或软件会要求选择语言或编码，免得用错编码取不出正确的字符😂。
 
+
+
+Unicode 存在的问题是，它只是一个符号集，只规定了符号的二进制代码，却没有规定这个二进制代码应该如何存储（占用几个字节，每个字节内怎么放等）。所以就出现了 UTF8、UTF16、UTF32 等不同的实现方式。
+
 ![image-20201203223541809](http://static.gmaso.cn/blog/2020/12/03/22/20023f9bff77ea1b66f007a7e1c85af7-0e478f-image-20201203223541809.png?imageslim)
 
-黄色的为 UTF8 中的控制位，第一个字节中的控制位中 1 的个数表示全部有几个字节，后续的字节都用 10 开头。
+UTF-8 就是在互联网上使用最广的一种 Unicode 的实现方式。黄色的为 UTF8 中的控制位，第一个字节中的控制位中 1 的个数表示全部有几个字节，后续的字节都用 10 开头。
 
-TODO 编码与字符集的概念区别？
+UTF-8 的编码规则很简单，只有二条：
+
+1）对于单字节的符号，字节的第一位设为 0，后面7位为这个符号的 Unicode 码。因此对于英语字母，UTF-8 编码和 ASCII 码是相同的。
+
+2）对于 n 字节的符号（n > 1），第一个字节的前n位都设为 1，第 n + 1 位设为 0，后面字节的前两位一律设为10。剩下的没有提及的二进制位，全部为这个符号的 Unicode 码。
+
+下表总结了编码规则，字母x表示可用编码的位。
+
+```
+Unicode 符号范围     |        UTF-8 编码方式
+(十六进制)        |              （二进制）
+----------------------+---------------------------------------------
+0000 0000-0000 007F | 0xxxxxxx
+0000 0080-0000 07FF | 110xxxxx 10xxxxxx
+0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx
+0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+```
+
+举例：严的 Unicode 是 4E25（100111000100101），根据上表，可以发现 4E25 处在第三行的范围内（0000 0800 - 0000 FFFF），因此严的 UTF-8 编码需要三个字节，即格式是1110xxxx 10xxxxxx 10xxxxxx。然后，从严的最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0。这样就得到了，严的 UTF-8 编码是11100100 10111000 10100101，转换成十六进制就是 E4B8A5。
+
+可以看到严的 Unicode码 是 4E25，UTF-8 编码是 E4B8A5，两者是不一样的。
+
+UTF8 规范为最长六个字节，但在 RFC3629 中限制只使用原来 Unicode 定义的区域，U+0000到U+10FFFF，也就是最长四个字节。
+
+在计算机内存中，统一使用 Unicode 码（就是个字符的序号，没有控制位等水分），当需要保存到硬盘或者需要传输的时候，再转换为 UTF-8 等具体编码方式。（不同编程语言内部实现由差异，比如 Rust 内部是 UTF8）
+
+
+
+##### Little endian 和 Big endian
+
+对于字符编码，第一个字节在前，就是"大头方式"（Big endian），第二个字节在前就是"小头方式"（Little endian）。比如 严 的编码为 4E25，第一个字节是 4E，第二个字节是 25，那么：4E 存在前面就是大头方式，25 存在前面就是小头方式。
+
+计算机怎么区分文件采用的是大头存储还是小头存储？Unicode 规范定义，每一个文件的最前面分别加入一个表示编码顺序的字符，这个字符的名字叫做"零宽度非换行空格"（zero width no-break space），用 FEFF 表示。这正好是两个字节，而且 FF 比 FE 大 1。如果一个文本文件的头两个字节是 FE FF，就表示该文件采用大头方式；如果头两个字节是 FF FE，就表示该文件采用小头方式。升序是大头，降序是小头。
+
+##### 资料参考
+
+[字符编码笔记：ASCII，Unicode 和 UTF-8](http://www.ruanyifeng.com/blog/2007/10/ascii_unicode_and_utf-8.html)
+
+
+
+编码与字符集的概念区别？
 
 字符（Character）是各种文字和符合的总称，包括各国家文字、标点符号、图形符号、数字等。字符集（Character set）就是字符的集合，与计算机无关。
 
@@ -325,7 +379,29 @@ TODO 编码与字符集的概念区别？
 
 [常见乱码问题分析和总结 - IBM Developer](https://developer.ibm.com/zh/articles/analysis-and-summary-of-common-random-code-problems/)
 
-TODO 用 js 函数把 string 进行编码
+
+
+用 JavaScript 函数获取字符串的 UTF8 二进制编码
+
+```
+function UTF8_encoding(str) {
+  const bytes = Buffer.from(str, 'utf8');
+  const array = [];
+  for (var i = 0; i < bytes.length; i++) {
+    const binary = bytes[i];
+    array.push(binary.toString(2).padStart(8, '0'));
+  }
+
+  console.log(array);
+  return bytes;
+}
+
+// UTF8_encoding('极客');
+
+UTF8_encoding('1');
+```
+
+
 
 #### String - Grammar
 

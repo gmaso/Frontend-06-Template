@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    function StringToNumber(str) {
+      str = '' + str;
+      if (!/^[0-9a-z.\-e]*$/i.test(str)) {
+        return NaN;
+      }
+      try {
+        if (str === '') {
+          return 0;
+        } else if (/\./.test(str) || /e/.test(str)) {
+          return parseFloat(str);
+        } else if (/^0b([01]+)/i.test(str)) {
+          return parseInt(str.match(/^0b([01]+)/i)[1], 2);
+        } else if (/^0o([0-7]+)/i.test(str)) {
+          return parseInt(str.match(/^0o([0-7]+)/i)[1], 8);
+        } else if (/^0x([0-9a-f]+)/i.test(str)) {
+          return parseInt(str.match(/^0x([0-9a-f]+)/i)[1], 16);
+        } else {
+          return parseInt(str, 10);
+        }
+      } catch (e) {
+        console.log(e);
+        return NaN;
+      }
+    }
+
+    console.log(StringToNumber('2.23e5'));
+
+    function NumberToString(num, radix = 10) {
+      let str = num.toString(radix);
+      if (radix == 2) {
+        str = '0b' + str;
+      } else if (radix == 8) {
+        str = '0o' + str;
+      } else if (radix == 16) {
+        str = '0x' + str;
+      }
+      return str;
+    }
+
+    console.log(NumberToString(25, 2));
+  </script>
+</body>
+</html>

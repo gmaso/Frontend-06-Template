@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="container" style="margin:0;height: 100vh;">
+  <script src="./realms-shim.umd.min.js"></script>
+  <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.0.3/dist/g6.min.js"></script>
+  <script>
+    const objects = Object.keys(Object.getOwnPropertyDescriptors(Realm.makeRootRealm().global));
+
+    const data = {
+      nodes: [
+        { id: '0', label: 'Realm', value: 'Realm' }
+      ].concat(objects.map((itm) => ({
+        id: itm,
+        label: itm,
+        value: itm,
+      }))),
+      edges: objects.map((itm) => ({
+        source: '0',
+        target: itm
+      })),
+    }
+
+    const width = document.querySelector('#container').clientWidth
+    const height = document.querySelector('#container').clientHeight
+
+    const graph = new G6.Graph({
+      container: 'container',
+      width,
+      height,
+      layout: {
+        type: 'force',
+        nodeStrength: 30,
+        collideStrength: 0.7,
+        alphaDecay: 0.01,
+        preventOverlap: true,
+      },
+      modes: {
+        default: ['drag-canvas', 'zoom-canvas', 'drag-node'],
+      },
+      defaultNode: {
+        size: [120, 120],
+      },
+    })
+
+    const nodes = data.nodes
+
+    // 抄袭同学的
+    function randomRgbaColor() {
+      //随机生成RGBA颜色
+      var r = Math.floor(Math.random() * 256) //随机生成256以内r值
+      var g = Math.floor(Math.random() * 256) //随机生成256以内g值
+      var b = Math.floor(Math.random() * 256) //随机生成256以内b值
+      var alpha = Math.random() //随机生成1以内a值
+      return `rgb(${r},${g},${b},${alpha})` //返回rgba(r,g,b,a)格式颜色
+    }
+
+    nodes.forEach((node) => {
+      if (!node.style) node.style = {}
+      node.style.fill = randomRgbaColor()
+      node.style.stroke = randomRgbaColor()
+    })
+
+    graph.data(data)
+    graph.render()
+  </script>
+</body>
+</html>

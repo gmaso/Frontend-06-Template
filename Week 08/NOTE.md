@@ -47,3 +47,45 @@ TODO 扩展：用状态机处理完全未知的pattern？
 
 答：[查找未知 pattern](./lesson7_kmp.js)
 
+
+
+## HTTP 协议
+
+### HTTP 协议解析
+
+ISO-OSI 七层网络模型：应用、表示、会话（这三层对应 HTTP）、传输（对应 TCP/UDP）、网络（对应 IP）、数据链路、物理层（这两层对应 4G/5G/Wi-Fi，对数据点对点的可靠传输）
+
+四层网络模型：应用层、传输层、网络层、数据链路层
+
+
+
+### 基础概念
+
+TCP 层：流、端口、require('net')
+
+IP 层：包、IP 地址、libnet/libpcap
+
+HTTP：Request、Response 一问一答模式，是文本型协议（所有内容都是字符）
+
+
+
+#### 实现 HTTP 请求
+
+基础库设计：从顶层的接口设计开始，自顶向下实现。
+
+Content-Type 是必须的字段，要设置默认值。
+
+headers 中的 Content-Length 必须设置正确，否则会是非法请求。
+
+body 需要根据 Content-Type 不同进行不同的处理。
+
+
+
+#### 解析 response
+
+状态机有不同的写法，可以用常量，也可以用之前的函数形式。
+
+分别使用状态机解析 response 和 body。
+
+由于 body 的结构和 headers 有关，需要在 headers 接收完成后判断 body 的类型，再进行处理。
+

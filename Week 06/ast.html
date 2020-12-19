@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tokenize</title>
+</head>
+<body>
+  
+  <script>
+    let regexp = /([0-9\.]+)|([ \t]+)|([\r\n]+)|(\*)|(\/)|(\+)|(\-)|(\()|(\))/g;
+    let dict = ['number', 'whitespace', 'lineTerminator', '*', '/', '+', '-', '(', ')'];
+
+    function* tokenize(string) {
+      let result = null;
+      let lastIndex = 0;
+      while(true) {
+        lastIndex = regexp.lastIndex;
+        result = regexp.exec(string);
+        if (!result) {
+          break;
+        }
+        // 判断上次解析到的位置和最新匹配到位置中间的字符长度是否等于匹配出来的字符长度，
+        // 如果不是，则说明有未匹配的字符，提示后跳出
+        if (regexp.lastIndex - lastIndex > result[0].length) {
+          console.log('存在不识别的字符');
+          break;
+        }
+        let token = {
+          type: null,
+          value: null
+        };
+        for (let i = 1; i <= dict.length; i += 1) {
+          if (result[i]) {
+            token.type = dict[i - 1];
+          }
+        }
+        token.value = result[0];
+        yield token;
+      }
+      yield {
+        type: 'EOF'
+      }
+    }
+
+    function ast(string) {
+      let source = [];
+      for (let token of tokenize(string)) {
+        if (token.type !== 'whitespace' && token.type !== 'lineTerminator') {
+          source.push(token);
+        }
+      }
+console.log(source);
+      return expression(source);
+    }
+
+    function expression(source) {
+      if (source[0].type === 'additiveExpression' && source[1] && source[1].type === 'EOF') {
+        let node = {
+          type: 'expression',
+          children: [source.shift(), source.shift()]
+        };
+        source.unshift(source);
+        return node;
+      }
+
+      // 执行解析
+      additiveExpression(source);
+      return expression(source);
+    }
+
+    function additiveExpression(source) {
+      // 对以 +、- 开头的字符串，在之前添加数字 0
+      if (source[0].type === '+' || source[0].type === '-') {
+        let token = {
+          type: 'number',
+          value: 0
+        }
+        source.unshift(token);
+        return additiveExpression(source);
+      }
+      // 把单个乘法解析为加法
+      if (source[0].type === 'multipicativeExpression') {
+        let node = {
+          type: 'additiveExpression',
+          children: [source[0]]
+        }
+        source[0] = node;
+        return additiveExpression(source);
+      }
+      if (source[0].type === 'additiveExpression' && source[1] && source[1].type === '+') {
+        let node = {
+          type: 'additiveExpression',
+          operator: '+',
+          children: []
+        };
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        // 对第三项执行乘法解析
+        multipicativeExpression(source);
+        node.children.push(source.shift());
+        source.unshift(node);
+        return additiveExpression(source);
+      }
+      if (source[0].type === 'additiveExpression' && source[1] && source[1].type === '-') {
+        let node = {
+          type: 'additiveExpression',
+          operator: '-',
+          children: []
+        };
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        // 对第三项执行乘法解析
+        multipicativeExpression(source);
+        node.children.push(source.shift());
+        source.unshift(node);
+        return additiveExpression(source);
+      }
+      if (source[0].type === 'additiveExpression') {
+        return source[0];
+      }
+
+      // 执行解析
+      multipicativeExpression(source);
+      return additiveExpression(source);
+    }
+
+    function multipicativeExpression(source) {
+      // 解析终结符，单个数字解析为乘法
+      if (source[0].type === 'bracketExpression') {
+        let node = {
+          type: 'multipicativeExpression',
+          children: [source[0]]
+        }
+        source[0] = node;
+        return multipicativeExpression(source);
+      }
+      if (source[0].type === 'multipicativeExpression' && source[1] && source[1].type === '*') {
+        let node = {
+          type: 'multipicativeExpression',
+          operator: '*',
+          children: []
+        };
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        source.unshift(node);
+        return multipicativeExpression(source);
+      }
+      if (source[0].type === 'multipicativeExpression' && source[1] && source[1].type === '/') {
+        let node = {
+          type: 'multipicativeExpression',
+          operator: '/',
+          children: []
+        };
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        source.unshift(node);
+        return multipicativeExpression(source);
+      }
+      if (source[0].type === 'multipicativeExpression') {
+        return source[0];
+      }
+
+      // 执行解析
+      bracketExpression(source);
+      return multipicativeExpression(source);
+    }
+
+    function bracketExpression(source) {
+      // 解析终结符，单个数字解析为乘法
+      if (source[0].type === 'number') {
+        let node = {
+          type: 'bracketExpression',
+          children: [source[0]]
+        }
+        source[0] = node;
+        return bracketExpression(source);
+      }
+      if (source[0].type === '(' && source[1] && source[1].type === 'multipicativeExpression' && source[2] && source[1].type === ')') {
+        let node = {
+          type: 'bracketExpression',
+          children: []
+        }
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        source.unshift(node);
+        return bracketExpression(source);
+      }
+      
+      if (source[0].type === 'bracketExpression') {
+        return source[0];
+      }
+    }
+
+    console.log(ast('(1 + 2) * 5 / 2.0 + 3 * 23'));
+  </script>
+</body>
+</html>

@@ -6,7 +6,8 @@ function match(string, pattern) {
       if (c === pattern[i]) {
         return funs[i+1];
       } else if (pattern.lastIndexOf(pattern[i-1], i - 2) > -1) {
-        return funs[pattern.lastIndexOf(pattern[i-1], i - 2)];
+        // 匹配上一个相同字符的后一位，reConsume
+        return funs[pattern.lastIndexOf(pattern[i-1], i - 2) + 1](c);
       } else {
         return funs[0];
       }
@@ -24,4 +25,4 @@ function match(string, pattern) {
 }
 
 console.log(match('abababcabcabxx', 'abcabcabx'));
-console.log(match('abababcabcabxx', 'abcabx')); // TOTO 这种情况判断错误
+console.log(match('abababcabcabxx', 'abcabx'));

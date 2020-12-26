@@ -6,6 +6,7 @@ function emit(token) {
 
 // 
 let currentToken = null;
+let currentAttribute = null;
 
 function data(c) {
   if (c === '<') {
@@ -57,6 +58,10 @@ function endTagOpen(c) {
 
 function tagName(c) {
   if (c.match(/^[\t\n\f ]$/)) {
+    currentAttribute = {
+      name: '',
+      value: ''
+    };
     return beforeAttributeName;
   } else if (c === '/') {
     return selfClosingStartTag;
@@ -73,14 +78,42 @@ function tagName(c) {
 
 function beforeAttributeName(c) {
   if (c.match(/^[\t\n\f ]$/)) {
+    currentAttribute = {
+      name: '',
+      value: ''
+    };
+    currentToken[currentAttribute.name] = currentAttribute.value;
     return beforeAttributeName;
   } else if (c === '=') {
+    return beforeAttributeValue;
+  } else if (c === '>' || c === '/') {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    return tagName(c);
+  } else if (c.match(/^[a-zA-Z]$/)) {
+    currentAttribute.name += c;
     return beforeAttributeName;
-  } else if (c === '>') {
-    emit(currentToken);
-    return data;
   } else {
     return beforeAttributeName;
+  }
+}
+
+function beforeAttributeValue(c) {
+  if (c.match(/^[\t\n\f ]$/) || c === '/') {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    currentAttribute = {
+      name: '',
+      value: ''
+    };
+    return beforeAttributeName;
+  } else if (c === '>') {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    emit(currentToken);
+    return data;
+  } else if (c.match(/^[a-zA-Z]$/)) {
+    currentAttribute.value += c;
+    return beforeAttributeValue;
+  } else {
+    return beforeAttributeValue;
   }
 }
 

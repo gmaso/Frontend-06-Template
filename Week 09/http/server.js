@@ -21,7 +21,7 @@ http.createServer((request, response) => {
 </head>
 <body>
   <div id="id" class="app">
-    <span>test</span>
+    <span class=a data-id>test</span>
   </div>
 </body>
 </html>`);

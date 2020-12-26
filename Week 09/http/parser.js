@@ -39,7 +39,7 @@ function tagOpen(c) {
 }
 
 function endTagOpen(c) {
-  if (c.match(/&[a-zA-Z]$/)) {
+  if (c.match(/^[a-zA-Z]$/)) {
     currentToken = {
       type: 'endTag',
       tagName: ''
@@ -77,6 +77,7 @@ function beforeAttributeName(c) {
   } else if (c === '=') {
     return beforeAttributeName;
   } else if (c === '>') {
+    emit(currentToken);
     return data;
   } else {
     return beforeAttributeName;
@@ -86,6 +87,7 @@ function beforeAttributeName(c) {
 function selfClosingStartTag(c) {
   if (c === '>') {
     currentToken.isSelfColsing = true;
+    emit(currentToken);
     return data;
   } else if (c === EOF) {
 
@@ -95,11 +97,8 @@ function selfClosingStartTag(c) {
 }
 
 module.exports.parseHTML = function parseHTML(html) {
-  console.log(html);
   let state = data;
   for (let c of html) {
-    console.log(c)
-    console.log(currentToken)
     state = state(c);
   }
   state = state(EOF);

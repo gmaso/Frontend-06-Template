@@ -10,19 +10,25 @@ http.createServer((request, response) => {
     body = Buffer.concat(body).toString();
     console.log('body', body);
     response.writeHead(200, {'Content-Type': 'text/html'});
-    response.end(`<html>
+    response.end(
+`<html meta=a >
 <head>
-  <title>Document</title>
-  <style>
-    div {
-      color: red;
-    }
-  </style>
+    <style>
+body div #myid {
+    width:100px;
+    background-color: #ff5000;
+}
+body div img{
+    width:30px;
+    background-color: #ff1111;
+}
+    </style>
 </head>
 <body>
-  <div id="id" class="app">
-    <span class=a data-id>test</span>
-  </div>
+    <div>
+        <img id="myid"/>
+        <img />
+    </div>
 </body>
 </html>`);
   });

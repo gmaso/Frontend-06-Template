@@ -17,7 +17,45 @@ function addCSSRules(text) {
 }
 
 function match(element, selector) {
+  // 假设 selector 是简单选择器。如果考虑复杂选择器，需要用正则进行拆分，然后进行关系处理
+  if (!selector || !element.attributes) {
+    return false;
+  }
+  if (selector.charAt(0) === '#') {
+    let id = element.attributes.filter((attr) => attr.name === 'id')[0];
+    if (id && id.value === selector.replace('#', '')) {
+      return true;
+    }
+  } else if (selector.charAt(0) === '.') {
+    let classNames = element.attributes.filter((attr) => attr.name === 'class');
+    if (classNames.some((className) => className.value === selector.replace('.', ''))) {
+      return true;
+    }
+  } else if (element.tagName === selector) {
+    return true;
+  }
+  return false;
+}
 
+function calcSpecificity(selectors) {
+  // 使用四元组 [0, 0, 0, 0] 分别表示 inline、id 数量、class 数量、tagName 数量
+  let spec = new Array(4).fill(0); // inline 位置为 0
+  spec[1] = selectors.filter(str => /^#[a-z]/i.test(str)).length;
+  spec[2] = selectors.filter(str => /^\.[a-z]/i.test(str)).length;
+  spec[3] = selectors.filter(str => /^[a-z]/i.test(str)).length;
+  return spec;
+}
+
+// 判断特异性A是否大于等于特异性B
+function compareSpecificity(specA, specB) {
+  let i = 0;
+  while (i < 4) {
+    if (specA[i] < specB[i]) {
+      return false;
+    }
+    i++;
+  }
+  return true;
 }
 
 function computeCSS(element) {
@@ -27,9 +65,11 @@ function computeCSS(element) {
     element.computedStyle = {};
   }
 
-  for (let rule of rules) {
+  for (let rule of CSSRules) {
     // 取出选择器，暂不考虑逗号分隔的选择器（只取 0）和复合选择器
     let selectorParts = rule.selectors[0].split(' ').reverse();
+    
+    let specificity = calcSpecificity(selectorParts);
 
     // 如果当前元素和最后一个选择器不匹配
     if (!match(element, selectorParts[0])) {
@@ -40,9 +80,11 @@ function computeCSS(element) {
 
     // 双循环选择器和元素
     let j = 1;
-    for (let i = 0; i < elements.length; i++) {
-      if (match(elements[i], selectorParts[j])) {
-        j++;
+    if (selectorParts.length > 1) {
+      for (let i = 0; i < elements.length; i++) {
+        if (match(elements[i], selectorParts[j])) {
+          j++;
+        }
       }
     }
     // 检查选择器是否都匹配到
@@ -51,7 +93,17 @@ function computeCSS(element) {
     }
 
     if (matched) {
-      console.log('Element', element, 'matched rule', rule);
+      rule.declarations.map((item) => {
+        if (!element.computedStyle[item.property]) {
+          // 使用对象存储属性，方便保存非 value 的其它参数，如优先级
+          element.computedStyle[item.property] = {};
+          element.computedStyle[item.property].specificity = [0, 0, 0, 0];
+        }
+        if (compareSpecificity(specificity, element.computedStyle[item.property].specificity)) {
+          element.computedStyle[item.property].value = item.value;
+          element.computedStyle[item.property].specificity = specificity;
+        }
+      });
     }
   }
 }
@@ -207,17 +259,16 @@ function beforeAttributeName(c) {
 }
 
 function beforeAttributeValue(c) {
-  if (c.match(/^[\t\n\f ]$/) || c === '/') {
+  if (c.match(/^[\t\n\f ]$/)) {
     currentToken[currentAttribute.name] = currentAttribute.value;
     currentAttribute = {
       name: '',
       value: ''
     };
     return beforeAttributeName;
-  } else if (c === '>') {
+  } else if (c === '>' || c === '/') {
     currentToken[currentAttribute.name] = currentAttribute.value;
-    emit(currentToken);
-    return data;
+    return tagName(c);
   } else if (c.match(/^[a-zA-Z]$/)) {
     currentAttribute.value += c;
     return beforeAttributeValue;
@@ -244,5 +295,5 @@ module.exports.parseHTML = function parseHTML(html) {
     state = state(c);
   }
   state = state(EOF);
-  console.log(stack[0])
+  return stack[0];
 }

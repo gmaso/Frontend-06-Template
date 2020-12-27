@@ -1,12 +1,58 @@
 const EOF = Symbol('EOF'); // 唯一代表结束
 
-function emit(token) {
-  console.log(token);
-}
 
 // 
 let currentToken = null;
 let currentAttribute = null;
+let currentTextNode = null;
+
+let stack = [{type: 'document', children: []}];
+
+function emit(token) {
+  console.log(token);
+  if (token.type === 'text') {
+    return;
+  }
+  // 取栈顶元素。栈顶始终保存当前正在处理的元素
+  let top = stack[stack.length - 1];
+
+  if (token.type === 'startTag') {
+    let element = {
+      type: 'element',
+      children: [],
+      attributes: []
+    };
+
+    element.tagName = token.tagName;
+
+    for (let p in token) {
+      if (p !== 'type' && p !== 'tagName') {
+        element.attributes.push({
+          name: p,
+          value: token[p]
+        });
+      }
+    }
+
+    top.children.push(element);
+    element.parent = top;
+
+    // 对自封闭标签，已经处理完毕， 不用入栈
+    if (!token.isSelfColsing) {
+      stack.push(element);
+    }
+
+    currentTextNode = null;
+  } else if (token.type === 'endTag') {
+    if (top.tagName !== token.tagName) {
+      throw new Error('Tag start end does\'t match!');
+    } else {
+      stack.pop();
+    }
+    currentTextNode = null;
+  }
+  
+}
 
 function data(c) {
   if (c === '<') {
@@ -135,4 +181,5 @@ module.exports.parseHTML = function parseHTML(html) {
     state = state(c);
   }
   state = state(EOF);
+  console.log(stack[0])
 }

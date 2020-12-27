@@ -9,10 +9,6 @@ let currentTextNode = null;
 let stack = [{type: 'document', children: []}];
 
 function emit(token) {
-  console.log(token);
-  if (token.type === 'text') {
-    return;
-  }
   // 取栈顶元素。栈顶始终保存当前正在处理的元素
   let top = stack[stack.length - 1];
 
@@ -50,6 +46,16 @@ function emit(token) {
       stack.pop();
     }
     currentTextNode = null;
+  } else if (token.type === 'text') {
+    if (!currentTextNode) {
+      currentTextNode = {
+        type: 'text',
+        content: ''
+      };
+      top.children.push(currentTextNode);
+      // currentTextNode.parent = top;
+    }
+    currentTextNode.content += token.content;
   }
   
 }

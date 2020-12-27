@@ -1,3 +1,5 @@
+const css = require('css');
+
 const EOF = Symbol('EOF'); // 唯一代表结束
 
 
@@ -7,6 +9,53 @@ let currentAttribute = null;
 let currentTextNode = null;
 
 let stack = [{type: 'document', children: []}];
+
+let CSSRules = [];
+function addCSSRules(text) {
+  let ast = css.parse(text);
+  CSSRules.push(...ast.stylesheet.rules);
+}
+
+function match(element, selector) {
+
+}
+
+function computeCSS(element) {
+  // 获取父元素序列，使用 slice 断开与 stack 的联系，reverse 是因为 CSS 匹配是从当前元素往上匹配
+  let elements = stack.slice().reverse();
+  if (!element.computedStyle) {
+    element.computedStyle = {};
+  }
+
+  for (let rule of rules) {
+    // 取出选择器，暂不考虑逗号分隔的选择器（只取 0）和复合选择器
+    let selectorParts = rule.selectors[0].split(' ').reverse();
+
+    // 如果当前元素和最后一个选择器不匹配
+    if (!match(element, selectorParts[0])) {
+      continue;
+    }
+
+    let matched = false;
+
+    // 双循环选择器和元素
+    let j = 1;
+    for (let i = 0; i < elements.length; i++) {
+      if (match(elements[i], selectorParts[j])) {
+        j++;
+      }
+    }
+    // 检查选择器是否都匹配到
+    if (j >= selectorParts.length) {
+      matched = true;
+    }
+
+    if (matched) {
+      console.log('Element', element, 'matched rule', rule);
+    }
+  }
+}
+
 
 function emit(token) {
   // 取栈顶元素。栈顶始终保存当前正在处理的元素
@@ -30,8 +79,11 @@ function emit(token) {
       }
     }
 
+    // 创建元素后，立即进行 CSS 计算
+    computeCSS(element);
+
     top.children.push(element);
-    element.parent = top;
+    // element.parent = top;
 
     // 对自封闭标签，已经处理完毕， 不用入栈
     if (!token.isSelfColsing) {
@@ -43,6 +95,11 @@ function emit(token) {
     if (top.tagName !== token.tagName) {
       throw new Error('Tag start end does\'t match!');
     } else {
+      // 遇到 style 结束标签时，添加 CSS 规则
+      // link 标签暂不处理
+      if (top.tagName === 'style') {
+        addCSSRules(currentTextNode.content);
+      }
       stack.pop();
     }
     currentTextNode = null;

@@ -16,33 +16,80 @@ function addCSSRules(text) {
   CSSRules.push(...ast.stylesheet.rules);
 }
 
+// 把形如 div#id.class[attr*=value] 的单个复杂选择器拆分为数组
+function toSingles(selector) {
+  let singles = [];
+  singles.push(...(selector.match(/^([a-z]+)/ig) || [])); // 类型选择器
+  singles.push(...(selector.match(/(\.[a-z]+)/ig) || [])); // 类选择器
+  singles.push(...(selector.match(/(#[a-z]+)/ig) || [])); // id选择器
+  singles.push(...(selector.match(/\[([a-z]+)([\^*$])?=['"]?([a-z0-9_-]+)['"]?]/ig) || [])); // 属性选择器
+  return singles;
+}
+
 function match(element, selector) {
   // 假设 selector 是简单选择器。如果考虑复杂选择器，需要用正则进行拆分，然后进行关系处理
   if (!selector || !element.attributes) {
     return false;
   }
-  if (selector.charAt(0) === '#') {
-    let id = element.attributes.filter((attr) => attr.name === 'id')[0];
-    if (id && id.value === selector.replace('#', '')) {
+  // 连续的复合选择器拆分，比如 div#id.class[attr*=value]
+  let singles = toSingles(selector);
+  // 判断是否满足选择器的每一部分
+  return singles.every((single) => matchSingle(element, single));
+
+  // 匹配元素与单个选择器
+  function matchSingle(element, selector) {
+    if (selector.charAt(0) === '#') {
+      let id = element.attributes.filter((attr) => attr.name === 'id')[0];
+      if (id && id.value === selector.replace('#', '')) {
+        return true;
+      }
+    } else if (selector.charAt(0) === '.') {
+      let className = element.attributes.filter((attr) => attr.name === 'class')[0];
+      if (className && className.value.split(' ').some((cname) => cname === selector.replace('.', ''))) {
+        return true;
+      }
+    } else if (selector.charAt(0) === '[') { // 属性选择器
+      let reg = /^\[([a-z]+)([\^*$])?=['"]?([a-z0-9_-]+)['"]?]$/i; // 只处理开始、包含、结束三种
+      if (!reg.test(selector)) {
+        return false;
+      }
+      let m = selector.match(reg);
+      let attr = m[1];
+      let type = m[2] || '';
+      let value = m[3];
+      let item = element.attributes.filter((item) => item.name === attr)[0];
+      if (item) {
+        if (type === '^' && item.value.indexOf(value) === 0) {
+          return true;
+        } else if (type === '*' && item.value.indexOf(value) > -1) {
+          return true;
+        } else if (type === '$' && item.value.indexOf(value) === item.value.length - value.length) {
+          return true;
+        } else if (item.value === value) {
+          return true;
+        }
+      }
+    } else if (element.tagName === selector) {
       return true;
     }
-  } else if (selector.charAt(0) === '.') {
-    let classNames = element.attributes.filter((attr) => attr.name === 'class');
-    if (classNames.some((className) => className.value === selector.replace('.', ''))) {
-      return true;
-    }
-  } else if (element.tagName === selector) {
-    return true;
+    return false;
   }
-  return false;
 }
 
-function calcSpecificity(selectors) {
+function calcSpecificity(selector) {
   // 使用四元组 [0, 0, 0, 0] 分别表示 inline、id 数量、class 数量、tagName 数量
+  let selectorParts = selector.split(' ');
+
+  let singles = [];
+  for ( let s of selectorParts) {
+    singles.push(...toSingles(s));
+  }
+
   let spec = new Array(4).fill(0); // inline 位置为 0
-  spec[1] = selectors.filter(str => /^#[a-z]/i.test(str)).length;
-  spec[2] = selectors.filter(str => /^\.[a-z]/i.test(str)).length;
-  spec[3] = selectors.filter(str => /^[a-z]/i.test(str)).length;
+  spec[1] += singles.filter(str => /^#[a-z]/i.test(str)).length; // id 选择器
+  spec[2] += singles.filter(str => /^\.[a-z]/i.test(str)).length; // 类选择器
+  spec[2] += singles.filter(str => /^\[[a-z]/i.test(str)).length; // 属性选择器
+  spec[3] += singles.filter(str => /^[a-z]/i.test(str)).length; // 标签选择器
   return spec;
 }
 
@@ -69,7 +116,7 @@ function computeCSS(element) {
     // 取出选择器，暂不考虑逗号分隔的选择器（只取 0）和复合选择器
     let selectorParts = rule.selectors[0].split(' ').reverse();
     
-    let specificity = calcSpecificity(selectorParts);
+    let specificity = calcSpecificity(rule.selectors[0]);
 
     // 如果当前元素和最后一个选择器不匹配
     if (!match(element, selectorParts[0])) {

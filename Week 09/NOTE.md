@@ -77,3 +77,7 @@ inline id class tagName
 - 属性名可以包含 - 和 :
 - 属性值可以是数字
 - 缓存特异性的值
+
+
+### 用 Jest 测试单个函数
+使用 Jest 测试 toSingles、match、calcSpecificity 三个函数。

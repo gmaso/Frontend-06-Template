@@ -19,10 +19,10 @@ function addCSSRules(text) {
 // 把形如 div#id.class[attr*=value] 的单个复杂选择器拆分为数组
 function toSingles(selector) {
   let singles = [];
-  singles.push(...(selector.match(/^([a-z]+)/ig) || [])); // 类型选择器
-  singles.push(...(selector.match(/(\.[a-z]+)/ig) || [])); // 类选择器
   singles.push(...(selector.match(/(#[a-z]+)/ig) || [])); // id选择器
+  singles.push(...(selector.match(/(\.[a-z]+)/ig) || [])); // 类选择器
   singles.push(...(selector.match(/\[([a-z]+)([\^*$])?=['"]?([a-z0-9_-]+)['"]?]/ig) || [])); // 属性选择器
+  singles.push(...(selector.match(/^([a-z]+)/ig) || [])); // 类型选择器
   return singles;
 }
 
@@ -384,3 +384,8 @@ module.exports.parseHTML = function parseHTML(html) {
   state = state(EOF);
   return stack[0];
 }
+
+// 导出函数，用于单元测试
+module.exports.toSingles = toSingles;
+module.exports.match = match;
+module.exports.calcSpecificity = calcSpecificity;

@@ -30,13 +30,17 @@ body div img#myid[id*=id][class$=eass] {
 }
 body div img#myid.myclass[id*=id][class$=ass] {
     height: 300px;
+    background-color: #fff;
+}
+.mapid[class$=ss] {
+    color: green;
 }
     </style>
 </head>
 <body>
     <div>
-        <img id="myid" class="myclass"/>
-        <img />
+        <img id="myid" class="myclass mapid"/>
+        <img id='my-1' data-ss=5/>
     </div>
 </body>
 </html>`);

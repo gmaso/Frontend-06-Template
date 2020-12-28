@@ -59,9 +59,13 @@ function match(element, selector) {
       let value = m[3];
       let item = element.attributes.filter((item) => item.name === attr)[0];
       if (item) {
-        if (type === '^' && item.value.indexOf(value) === 0) {
+        if (type === '^' && attr === 'class' && item.value.split(' ').some((cname) => cname.indexOf(value) === 0)) { // 特殊处理 class 的匹配，可以空格分隔
+          return true;
+        } else if (type === '^' && item.value.indexOf(value) === 0) {
           return true;
         } else if (type === '*' && item.value.indexOf(value) > -1) {
+          return true;
+        } else if (type === '$' && attr === 'class' && item.value.split(' ').some((cname) => cname.indexOf(value) === cname.length - value.length)) { // 特殊处理 class 的匹配，可以空格分隔
           return true;
         } else if (type === '$' && item.value.indexOf(value) === item.value.length - value.length) {
           return true;
@@ -76,7 +80,13 @@ function match(element, selector) {
   }
 }
 
+// 缓存特异性的值
+const specificityMap = new Map();
 function calcSpecificity(selector) {
+  if (specificityMap.has(selector)) {
+    return specificityMap.get(selector);
+  }
+
   // 使用四元组 [0, 0, 0, 0] 分别表示 inline、id 数量、class 数量、tagName 数量
   let selectorParts = selector.split(' ');
 
@@ -90,6 +100,8 @@ function calcSpecificity(selector) {
   spec[2] += singles.filter(str => /^\.[a-z]/i.test(str)).length; // 类选择器
   spec[2] += singles.filter(str => /^\[[a-z]/i.test(str)).length; // 属性选择器
   spec[3] += singles.filter(str => /^[a-z]/i.test(str)).length; // 标签选择器
+
+  specificityMap.set(selector, spec);
   return spec;
 }
 
@@ -170,7 +182,7 @@ function emit(token) {
     element.tagName = token.tagName;
 
     for (let p in token) {
-      if (p !== 'type' && p !== 'tagName') {
+      if (p && p !== 'type' && p !== 'tagName') {
         element.attributes.push({
           name: p,
           value: token[p]
@@ -297,7 +309,7 @@ function beforeAttributeName(c) {
   } else if (c === '>' || c === '/') {
     currentToken[currentAttribute.name] = currentAttribute.value;
     return tagName(c);
-  } else if (c.match(/^[a-zA-Z]$/)) {
+  } else if (c.match(/^[a-zA-Z-:]$/)) { // 属性名可以包含 - 和 :
     currentAttribute.name += c;
     return beforeAttributeName;
   } else {
@@ -313,14 +325,42 @@ function beforeAttributeValue(c) {
       value: ''
     };
     return beforeAttributeName;
+  } else if (c === '"') {
+    return doubleQuatedAttributeName;
+  } else if (c === '\'') {
+    return singleQuatedAttributeName;
   } else if (c === '>' || c === '/') {
     currentToken[currentAttribute.name] = currentAttribute.value;
     return tagName(c);
-  } else if (c.match(/^[a-zA-Z]$/)) {
+  } else if (c.match(/^[a-zA-Z0-9]$/)) {
     currentAttribute.value += c;
     return beforeAttributeValue;
   } else {
     return beforeAttributeValue;
+  }
+}
+
+function doubleQuatedAttributeName(c) {
+  if (c === '"') {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    return beforeAttributeValue;
+  } else if (c === EOF) {
+
+  } else {
+    currentAttribute.value += c;
+    return doubleQuatedAttributeName;
+  }
+}
+
+function singleQuatedAttributeName(c) {
+  if (c === '\'') {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    return beforeAttributeValue;
+  } else if (c === EOF) {
+
+  } else {
+    currentAttribute.value += c;
+    return singleQuatedAttributeName;
   }
 }
 

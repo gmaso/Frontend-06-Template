@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1>标题</h1>
+  <div id="wrap">
+    <h2>子标题</h2>
+    <div id="content" class="main-content">
+      <a href="javascript:;" class="title">测试</a>
+      <div class="text">
+        <span id="gray" class="gray">灰色</span>
+      </div>
+    </div>
+  </div>
+  <script src="./match.js"></script>
+  <script>
+    console.log(match("#content", document.getElementById("content"))); // true
+    console.log(match(".main-content .gray", document.getElementById("gray"))); // true
+    console.log(match(".main-constent .gray", document.getElementById("gray"))); // false
+  </script>
+</body>
+</html>

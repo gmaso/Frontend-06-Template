@@ -62,6 +62,59 @@ CSS2 specification 已废弃。
 
 ## 收集标准
 使用 js 配合 iframe，抓取相关标准的页面内容，然后进行处理。
+```javascript
+// https://www.w3.org/TR 页面，收集所有 CSS 相关规范
+let cssSpecs = [];
+[...document.getElementById('container').children].filter(element => /css/.test(element.getAttribute('data-tag'))).forEach(element => { cssSpecs.push({ name: element.getAttribute('data-title'), status: element.getAttribute('data-status'), url: element.getElementsByTagName('a')[0].getAttribute('href') }) });
+
+// 使用 iframe 加载页面，处理获取想要的数据
+let iframe = document.createElement('iframe');
+iframe.style.position = 'absolute';
+iframe.style.top = '0px';
+// document.body.innerHTML = '';
+document.body.appendChild(iframe);
+
+function sleep(time) {
+  return new Promise(resolve => {
+    setTimeout(resolve, time || 0);
+  });
+}
+
+function load(element, event) {
+  return new Promise((resolve) => {
+    // 执行一次后清除
+    let handler = () => {
+      element.removeEventListener(event, handler);
+      resolve();
+    }
+    element.addEventListener(event, handler);
+  });
+}
+
+let properties = {};
+void async function () {
+  for (let spec of cssSpecs) {
+    iframe.src = spec.url;
+    console.log(spec.name);
+    // iframe 同步加载页面
+    await load(iframe, 'load');
+    // 处理规范，获取想要的数据，比如属性和值
+    let elements = iframe.contentDocument.querySelectorAll('.propdef');
+    [...elements].forEach(e => {
+      console.log(e);
+      properties[(e.querySelector('.dfn-paneled') || e.getElementsByTagName('tr')[0].children[1]).innerText] = ({
+        value: (e.querySelector('.production') || e.querySelector('.prod') || e.getElementsByTagName('tr')[1].children[1]).innerText,
+        initial: e.getElementsByTagName('tr')[2]?.children[1]?.innerText,
+      });
+    });
+    await sleep(100);
+  }
+}();
+console.log('属性获取完毕！');
+console.log(properties);
+
+```
+
 
 ## 选择器
 ### 语法

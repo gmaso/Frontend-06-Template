@@ -168,3 +168,14 @@ CSS 图形的最佳实践：使用 data uri + svg
 
 作业：对 CSS 的属性进行分类。
 
+分类为：Layout 相关（影响元素位置和大小）、Render 相关（影响元素渲染）。
+
+![image-20210117142503017](http://static.gmaso.cn/blog/2021/01/17/14/6b9c9173f32722355be2fb845a7025cf-66eba4-image-20210117142503017.png?imageslim)
+
+
+
+参考资料：
+
+1. [CSS所有属性分类（快速查找） - CSDN](https://blog.csdn.net/qq_16546829/article/details/81979142)
+2. [CSS值类型文档大全 - 张鑫旭](https://www.zhangxinxu.top/wordpress/2019/11/css-value-type/)
+

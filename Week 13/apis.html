@@ -16,10 +16,17 @@
     let resultDom = document.querySelector('.result');
 
     function filterOut(names, specObj) {
-      let specTitle = specObj.spec || '';
+      let specUrl = specObj.spec || '';
       let p;
       p = document.createElement('p');
-      p.innerHTML = '规范：' + specTitle;
+      p.innerHTML = !specObj.spec ? '规范：' + specObj.title : '规范：';
+      if (specObj.spec) {
+        let a = document.createElement('a');
+        a.innerHTML = specObj.title;
+        a.setAttribute('href', specUrl);
+        a.setAttribute('target', '_blank');
+        p.append(a);
+      }
       resultDom.append(p);
       if (specObj.filter) {
         p = document.createElement('p');
@@ -42,100 +49,191 @@
       return newNames;
     }
 
-    // ECMA 262 标准中的属性
     names = filterOut(names, {
+      title: 'ECMAScript® 2020 Language Specification',
       spec: 'https://262.ecma-international.org/11.0/',
-      filter: "[...document.querySelectorAll('h1')].filter(ele => /^(18\.\d+\.(\d+\s|6\.[2345])|b\.2\.1\.)/i.test(ele.innerText)).map(ele => ele.innerText.split(' ')[1])",
-      names: ["globalThis", "Infinity", "NaN", "undefined", "eval", "isFinite", "isNaN", "parseFloat", "parseInt", "URI", "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent", "Array", "ArrayBuffer", "BigInt", "BigInt64Array", "BigUint64Array", "Boolean", "DataView", "Date", "Error", "EvalError", "Float32Array", "Float64Array", "Function", "Int8Array", "Int16Array", "Int32Array", "Map", "Number", "Object", "Promise", "Proxy", "RangeError", "ReferenceError", "RegExp", "Set", "SharedArrayBuffer", "String", "Symbol", "SyntaxError", "TypeError", "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array", "URIError", "WeakMap", "WeakSet", "Atomics", "JSON", "Math", "Reflect", "escape", "unescape"]
+      filter: "[...document.querySelectorAll('h1')].filter(ele => /^(18\.\d+\.(\d+\s|6\.[2345])|b\.2\.1\.)/i.test(ele.innerText)).map(ele => ele.innerText.split(' ')[1]).sort()",
+      names: ["Array", "ArrayBuffer", "Atomics", "BigInt", "BigInt64Array", "BigUint64Array", "Boolean", "DataView", "Date", "Error", "EvalError", "Float32Array", "Float64Array", "Function", "Infinity", "Int16Array", "Int32Array", "Int8Array", "JSON", "Map", "Math", "NaN", "Number", "Object", "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect", "RegExp", "Set", "SharedArrayBuffer", "String", "Symbol", "SyntaxError", "TypeError", "URI", "URIError", "Uint16Array", "Uint32Array", "Uint8Array", "Uint8ClampedArray", "WeakMap", "WeakSet", "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent", "escape", "eval", "globalThis", "isFinite", "isNaN", "parseFloat", "parseInt", "undefined", "unescape"]
     });
 
-    // console
     names = filterOut(names, {
-      spec: 'console',
+      title: 'Console',
+      spec: 'https://console.spec.whatwg.org/',
+      filter: "[...document.querySelectorAll('.brief code')].map(ele => ele.innerText).sort()",
       names: ["console"]
+    });
+
+    names = filterOut(names, {
+      title: 'DOM',
+      spec: 'https://dom.spec.whatwg.org/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["AbortController", "AbortSignal", "AbstractRange", "Attr", "CDATASection", "CharacterData", "ChildNode", "Comment", "CustomEvent", "DOMConfiguration", "DOMError", "DOMErrorHandler", "DOMImplementation", "DOMImplementationList", "DOMImplementationSource", "DOMLocator", "DOMObject", "DOMTokenList", "DOMUserData", "Document", "DocumentFragment", "DocumentOrShadowRoot", "DocumentType", "Element", "Entity", "EntityReference", "Event", "EventTarget", "HTMLCollection", "MutationEvent", "MutationNameEvent", "MutationObserver", "MutationRecord", "NameList", "NamedNodeMap", "Node", "NodeIterator", "NodeList", "NonDocumentTypeChildNode", "NonElementParentNode", "Notation", "ParentNode", "ProcessingInstruction", "Range", "RangeException", "ShadowRoot", "Slottable", "StaticRange", "Text", "TreeWalker", "TypeInfo", "UserDataHandler", "XMLDocument", "XPathEvaluator", "XPathEvaluatorBase", "XPathExpression", "XPathResult"]
+    });
+    
+    names = filterOut(names, {
+      title: 'Encoding',
+      spec: 'https://encoding.spec.whatwg.org/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["TextDecoder", "TextDecoderCommon", "TextDecoderStream", "TextEncoder", "TextEncoderCommon", "TextEncoderStream"]
+    });
+    
+    names = filterOut(names, {
+      title: 'Fetch',
+      spec: 'https://fetch.spec.whatwg.org/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["Body", "Headers", "Request", "Response"]
+    });
+
+    names = filterOut(names, {
+      title: 'Encoding',
+      spec: 'https://html.spec.whatwg.org/multipage/indices.html#all-interfaces',
+      filter: "[...document.querySelectorAll('.brief code')].map(ele => ele.innerText).sort()",
+      names: ["AudioTrack", "AudioTrackList", "BarProp", "BeforeUnloadEvent", "BroadcastChannel", "CanvasGradient", "CanvasPattern", "CanvasRenderingContext2D", "CloseEvent", "CustomElementRegistry", "DOMParser", "DOMStringList", "DOMStringMap", "DataTransfer", "DataTransferItem", "DataTransferItemList", "DedicatedWorkerGlobalScope", "Document", "DragEvent", "ElementInternals", "ErrorEvent", "EventSource", "External", "FormDataEvent", "HTMLAllCollection", "HTMLAnchorElement", "HTMLAreaElement", "HTMLAudioElement", "HTMLBRElement", "HTMLBaseElement", "HTMLBodyElement", "HTMLButtonElement", "HTMLCanvasElement", "HTMLDListElement", "HTMLDataElement", "HTMLDataListElement", "HTMLDetailsElement", "HTMLDialogElement", "HTMLDirectoryElement", "HTMLDivElement", "HTMLElement", "HTMLEmbedElement", "HTMLFieldSetElement", "HTMLFontElement", "HTMLFormControlsCollection", "HTMLFormElement", "HTMLFrameElement", "HTMLFrameSetElement", "HTMLHRElement", "HTMLHeadElement", "HTMLHeadingElement", "HTMLHtmlElement", "HTMLIFrameElement", "HTMLImageElement", "HTMLInputElement", "HTMLLIElement", "HTMLLabelElement", "HTMLLegendElement", "HTMLLinkElement", "HTMLMapElement", "HTMLMarqueeElement", "HTMLMediaElement", "HTMLMenuElement", "HTMLMetaElement", "HTMLMeterElement", "HTMLModElement", "HTMLOListElement", "HTMLObjectElement", "HTMLOptGroupElement", "HTMLOptionElement", "HTMLOptionsCollection", "HTMLOutputElement", "HTMLParagraphElement", "HTMLParamElement", "HTMLPictureElement", "HTMLPreElement", "HTMLProgressElement", "HTMLQuoteElement", "HTMLScriptElement", "HTMLSelectElement", "HTMLSlotElement", "HTMLSourceElement", "HTMLSpanElement", "HTMLStyleElement", "HTMLTableCaptionElement", "HTMLTableCellElement", "HTMLTableColElement", "HTMLTableElement", "HTMLTableRowElement", "HTMLTableSectionElement", "HTMLTemplateElement", "HTMLTextAreaElement", "HTMLTimeElement", "HTMLTitleElement", "HTMLTrackElement", "HTMLUListElement", "HTMLUnknownElement", "HTMLVideoElement", "HashChangeEvent", "History", "ImageBitmap", "ImageBitmapRenderingContext", "ImageData", "Location", "MediaError", "MessageChannel", "MessageEvent", "MessagePort", "MimeType", "MimeTypeArray", "Navigator", "OffscreenCanvas", "OffscreenCanvasRenderingContext2D", "PageTransitionEvent", "Path2D", "Plugin", "PluginArray", "PopStateEvent", "PromiseRejectionEvent", "RadioNodeList", "SharedWorker", "SharedWorkerGlobalScope", "Storage", "StorageEvent", "SubmitEvent", "TextMetrics", "TextTrack", "TextTrackCue", "TextTrackCueList", "TextTrackList", "TimeRanges", "TrackEvent", "ValidityState", "VideoTrack", "VideoTrackList", "WebSocket", "Window", "Worker", "WorkerGlobalScope", "WorkerLocation", "WorkerNavigator", "Worklet", "WorkletGlobalScope"]
+    });
+    
+    names = filterOut(names, {
+      title: 'Notifications API',
+      spec: 'https://notifications.spec.whatwg.org/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["Notification", "NotificationEvent"]
+    });
+    
+    names = filterOut(names, {
+      title: 'Storage',
+      spec: 'https://storage.spec.whatwg.org/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["NavigatorStorage", "StorageManager"]
+    });
+    
+    names = filterOut(names, {
+      title: 'Streams',
+      spec: 'https://streams.spec.whatwg.org/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["ByteLengthQueuingStrategy", "CountQueuingStrategy", "GenericTransformStream", "ReadableByteStreamController", "ReadableStream", "ReadableStreamBYOBReader", "ReadableStreamBYOBRequest", "ReadableStreamDefaultController", "ReadableStreamDefaultReader", "ReadableStreamGenericReader", "TransformStream", "TransformStreamDefaultController", "WritableStream", "WritableStreamDefaultController", "WritableStreamDefaultWriter"]
+    });
+
+    names = filterOut(names, {
+      title: 'URL',
+      spec: 'https://url.spec.whatwg.org/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["URL", "URLSearchParams", "webkitURL"]
+    });
+    
+    names = filterOut(names, {
+      title: 'XMLHttpRequest',
+      spec: 'https://xhr.spec.whatwg.org/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["FormData", "ProgressEvent", "XMLHttpRequest", "XMLHttpRequestEventTarget", "XMLHttpRequestUpload"]
+    });
+
+    names = filterOut(names, {
+      title: 'WebGL Specification',
+      spec: 'https://www.khronos.org/registry/webgl/specs/latest/1.0/',
+      filter: "[...document.querySelectorAll('dfn')].map(ele => ele.innerText).sort()",
+      names: ["WebGLActiveInfo", "WebGLBuffer", "WebGLContextAttributes", "WebGLContextEvent", "WebGLFramebuffer", "WebGLObject", "WebGLProgram", "WebGLRenderbuffer", "WebGLRenderingContext", "WebGLRenderingContextBase", "WebGLRenderingContextOverloads", "WebGLShader", "WebGLShaderPrecisionFormat", "WebGLTexture", "WebGLUniformLocation"]
+    });
+
+    names = filterOut(names, {
+      title: 'WebGL 2.0 Specification',
+      spec: 'https://www.khronos.org/registry/webgl/specs/latest/2.0/',
+      filter: "[...document.querySelectorAll('dfn')].map(ele => ele.innerText).sort()",
+      names: ["WebGL2RenderingContext", "WebGL2RenderingContextBase", "WebGL2RenderingContextOverloads", "WebGLQuery", "WebGLSampler", "WebGLSync", "WebGLTransformFeedback", "WebGLVertexArrayObject"]
     });
 
     // intl
     names = filterOut(names, {
+      title: 'ECMAScript® 2021 Internationalization API Specification',
       spec: 'https://tc39.es/ecma402/#intl-object',
       names: ["Intl"]
     });
 
-    // webkit 标准中的属性
     names = filterOut(names, {
-      spec: 'webkit',
-      filterFunc: name => /^webkit/i.test(name)
+      title: 'Scalable Vector Graphics (SVG) 1.1 (Second Edition)',
+      spec: 'https://www.w3.org/TR/SVG11/single-page.html',
+      filter: "[...document.querySelectorAll('.toc li')].filter(ele => /^\d+\.\d+\.\d+\sInterface\s/.test(ele.innerText)).map(ele => ele.innerText.split(' ')[2])",
+      names: ["SVGAngle", "SVGAnimatedAngle", "SVGAnimatedBoolean", "SVGAnimatedEnumeration", "SVGAnimatedInteger", "SVGAnimatedLength", "SVGAnimatedLengthList", "SVGAnimatedNumber", "SVGAnimatedNumberList", "SVGAnimatedRect", "SVGAnimatedString", "SVGCSSRule", "SVGColor", "SVGElement", "SVGExternalResourcesRequired", "SVGFitToViewBox", "SVGICCColor", "SVGLangSpace", "SVGLength", "SVGLengthList", "SVGLocatable", "SVGNumber", "SVGNumberList", "SVGRect", "SVGRenderingIntent", "SVGStringList", "SVGStylable", "SVGTests", "SVGTransformable", "SVGURIReference", "SVGUnitTypes", "SVGViewSpec", "SVGZoomAndPan"]
+    });
+
+    names = filterOut(names, {
+      title: 'https://svgwg.org/svg2-draft/Overview.html',
+      spec: 'https://svgwg.org/svg2-draft/idlindex.html',
+      filter: "[...document.querySelectorAll('.toc li')].filter(ele => /^\d+\.\d+\.\d+\.\sInterface\s/.test(ele.innerText)).map(ele => ele.innerText.split(/\s/)[2])",
+      names: ["SVGElement", "SVGGraphicsElement", "SVGGeometryElement", "SVGNumber", "SVGLength", "SVGAngle", "SVGNumberList", "SVGLengthList", "SVGStringList", "SVGAnimatedBoolean", "SVGAnimatedEnumeration", "SVGAnimatedInteger", "SVGAnimatedNumber", "SVGAnimatedLength", "SVGAnimatedAngle", "SVGAnimatedString", "SVGAnimatedRect", "SVGAnimatedNumberList", "SVGAnimatedLengthList", "SVGUnitTypes", "SVGSVGElement", "SVGGElement", "SVGDefsElement", "SVGDescElement", "SVGMetadataElement", "SVGTitleElement", "SVGSymbolElement", "SVGUseElement", "SVGUseElementShadowRoot", "ShadowAnimation", "SVGSwitchElement", "SVGStyleElement", "SVGTransform", "SVGTransformList", "SVGAnimatedTransformList", "SVGPreserveAspectRatio", "SVGAnimatedPreserveAspectRatio", "SVGPathElement", "SVGRectElement", "SVGCircleElement", "SVGEllipseElement", "SVGLineElement", "SVGPointList", "SVGPolylineElement", "SVGPolygonElement", "SVGTextContentElement", "SVGTextPositioningElement", "SVGTextElement", "SVGTSpanElement", "SVGTextPathElement", "SVGImageElement", "SVGForeignObjectElement", "SVGMarkerElement", "SVGGradientElement", "SVGLinearGradientElement", "SVGRadialGradientElement", "SVGStopElement", "SVGPatternElement", "SVGScriptElement", "SVGAElement", "SVGViewElement"]
+    });
+
+    names = filterOut(names, {
+      title: 'SVG Animations Level 2',
+      spec: 'https://svgwg.org/specs/animations/#IDL',
+      filter: "[...document.querySelectorAll('.toc li')].filter(ele => /^5\.\d/i.test(ele.innerText)).map(ele => ele.innerText.split(/interface\s*/i)[1]).sort()",
+      names: ["SVGAnimateElement", "SVGAnimateMotionElement", "SVGAnimateTransformElement", "SVGAnimationElement", "SVGDiscardElement", "SVGMPathElement", "SVGSVGElement", "SVGSetElement", "TimeEvent"]
     });
     
-    // webkit 标准中的属性
     names = filterOut(names, {
-      spec: 'webGL',
-      filterFunc: name => /^webgl/i.test(name)
-    });
-
-    // DOM
-    names = filterOut(names, {
-      spec: 'DOM',
-      filterFunc: name => /^DOM/i.test(name)
-    });
-
-    // html
-    names = filterOut(names, {
-      spec: 'HTML',
-      filterFunc: name => /^html/i.test(name)
+      title: 'Filter Effects Module Level 1',
+      spec: 'https://drafts.fxtf.org/filter-effects/#idl-index',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["SVGComponentTransferFunctionElement", "SVGFEBlendElement", "SVGFEColorMatrixElement", "SVGFEComponentTransferElement", "SVGFECompositeElement", "SVGFEConvolveMatrixElement", "SVGFEDiffuseLightingElement", "SVGFEDisplacementMapElement", "SVGFEDistantLightElement", "SVGFEDropShadowElement", "SVGFEFloodElement", "SVGFEFuncAElement", "SVGFEFuncBElement", "SVGFEFuncGElement", "SVGFEFuncRElement", "SVGFEGaussianBlurElement", "SVGFEImageElement", "SVGFEMergeElement", "SVGFEMergeNodeElement", "SVGFEMorphologyElement", "SVGFEOffsetElement", "SVGFEPointLightElement", "SVGFESpecularLightingElement", "SVGFESpotLightElement", "SVGFETileElement", "SVGFETurbulenceElement", "SVGFilterElement", "SVGFilterPrimitiveStandardAttributes"]
     });
     
-    // svg
     names = filterOut(names, {
-      spec: 'SVG',
-      filterFunc: name => /^svg/i.test(name)
+      title: 'CSS Masking Module Level 1',
+      spec: 'https://drafts.fxtf.org/css-masking-1/#idl-index',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["SVGClipPathElement", "SVGMaskElement"]
     });
 
-    // 事件
     names = filterOut(names, {
-      spec: '事件',
+      title: '事件相关',
       filterFunc: name => /^on/i.test(name)
     });
     
     // CSS
     names = filterOut(names, {
-      spec: 'CSS',
+      title: 'CSSOM View Module',
+      spec: 'https://drafts.csswg.org/cssom-view/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["CaretPosition", "GeometryUtils", "MediaQueryList", "MediaQueryListEvent", "Screen"].concat([])
+    });
+    
+    // CSS
+    names = filterOut(names, {
+      title: 'CSS',
       filterFunc: name => /^css/i.test(name)
     });
     
     // Audio
     names = filterOut(names, {
-      spec: 'Audio',
+      title: 'Audio',
       filterFunc: name => /^Audio/i.test(name)
     });
     
     // Performance
     names = filterOut(names, {
-      spec: 'Performance',
+      title: 'Performance',
       filterFunc: name => /^Performance/i.test(name)
     });
     
     // Bluetooth
     names = filterOut(names, {
-      spec: 'Bluetooth',
+      title: 'Bluetooth',
       filterFunc: name => /^Bluetooth/i.test(name)
     });
     
     // Cookie
     names = filterOut(names, {
-      spec: 'Cookie',
+      title: 'Cookie',
       filterFunc: name => /^Cookie/i.test(name)
     });
     
     // RTC
     names = filterOut(names, {
-      spec: 'RTC',
+      title: 'RTC',
       filterFunc: name => /^RTC/i.test(name)
     });
     
     // Payment
     names = filterOut(names, {
-      spec: 'Payment',
+      title: 'Payment',
       filterFunc: name => /^Payment/i.test(name)
     });
 

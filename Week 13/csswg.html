@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="result"></div>
+
+  <script>
+    // https://drafts.csswg.org/ https://drafts.css-houdini.org/ 页面运行如下 js，获取定义的接口
+    let cssSpecs = [];
+    let host = location.protocol + '//' + location.host;
+    [...document.querySelectorAll('.body a')].filter(element => /^\//.test(element.getAttribute('href'))).forEach(element => { cssSpecs.push({ name: element.innerText, url: host + element.getAttribute('href') }) });
+
+    // 使用 iframe 加载页面，处理获取想要的数据
+    let iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.top = '0px';
+    // document.body.innerHTML = '';
+    document.body.appendChild(iframe);
+
+    function sleep(time) {
+      return new Promise(resolve => {
+        setTimeout(resolve, time || 0);
+      });
+    }
+
+    function load(element, event) {
+      return new Promise((resolve) => {
+        // 执行一次后清除
+        let handler = () => {
+          element.removeEventListener(event, handler);
+          resolve();
+        }
+        element.addEventListener(event, handler);
+
+        // 设置超时 2min
+        setTimeout(handler, 120000);
+      });
+    }
+
+    let properties = [];
+    void async function () {
+      for (let spec of cssSpecs) {
+        iframe.src = spec.url;
+        console.log(spec.name);
+        // iframe 同步加载页面
+        await load(iframe, 'load');
+        // 处理规范，获取想要的数据，比如属性和值
+        let names = [...iframe.contentDocument.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort();
+        if (names.length) {
+          console.log(names);
+          properties.push({
+            title: spec.name,
+            spec: spec.url,
+            filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+            names: names
+          });
+          console.log(properties.length);
+        }
+        await sleep(100);
+      }
+    }();
+
+    // 运行完成后执行
+    properties.map(ele => console.log(ele.title, ele.spec, ele.names));
+    
+    console.log('属性获取完毕！');
+    console.log(properties);
+  </script>
+</body>
+</html>

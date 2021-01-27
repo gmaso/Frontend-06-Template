@@ -216,4 +216,11 @@ element 对象：scrollTop、scrollLeft、scrollWidth、scrollHeight、scroll(x,
 - W3C：webaudio、animation、IG/CG/WG（兴趣组/社区组/工作组）
 
 #### 作业与实验：浏览器全部 API 的分类与整理
+见 [apis.html](apis.html)
 
+整理心得：
+- 发现 window 下的属性来自很多不同的组织、不同的规范
+- 规范的状态也有所不同，如推荐、候选、工作组、社区组等
+- 有些规范已经较长事件没更新，可能不会称为正式标准
+- 有些属性已经废弃，由于兼容性或时间原因，还保留在 window 中
+- 碰到不了解的属性，应该首先查询 MDN，了解属性来源于什么规范、解决什么问题、当前状态

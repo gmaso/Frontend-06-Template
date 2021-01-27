@@ -90,6 +90,51 @@
       ])
     },
     {
+      title: 'Scalable Vector Graphics (SVG) 1.1 (Second Edition)',
+      spec: 'https://www.w3.org/TR/SVG11/single-page.html',
+      filter: "[...document.querySelectorAll('.toc li')].filter(ele => /^\d+\.\d+\.\d+\sInterface\s/.test(ele.innerText)).map(ele => ele.innerText.split(' ')[2])",
+      names: ["SVGAngle", "SVGAnimatedAngle", "SVGAnimatedBoolean", "SVGAnimatedEnumeration", "SVGAnimatedInteger", "SVGAnimatedLength", "SVGAnimatedLengthList", "SVGAnimatedNumber", "SVGAnimatedNumberList", "SVGAnimatedRect", "SVGAnimatedString", "SVGCSSRule", "SVGColor", "SVGElement", "SVGExternalResourcesRequired", "SVGFitToViewBox", "SVGICCColor", "SVGLangSpace", "SVGLength", "SVGLengthList", "SVGLocatable", "SVGNumber", "SVGNumberList", "SVGRect", "SVGRenderingIntent", "SVGStringList", "SVGStylable", "SVGTests", "SVGTransformable", "SVGURIReference", "SVGUnitTypes", "SVGViewSpec", "SVGZoomAndPan"]
+    },
+    {
+      title: 'https://svgwg.org/svg2-draft/Overview.html',
+      spec: 'https://svgwg.org/svg2-draft/idlindex.html',
+      filter: "[...document.querySelectorAll('.toc li')].filter(ele => /^\d+\.\d+\.\d+\.\sInterface\s/.test(ele.innerText)).map(ele => ele.innerText.split(/\s/)[2])",
+      names: ["SVGElement", "SVGGraphicsElement", "SVGGeometryElement", "SVGNumber", "SVGLength", "SVGAngle", "SVGNumberList", "SVGLengthList", "SVGStringList", "SVGAnimatedBoolean", "SVGAnimatedEnumeration", "SVGAnimatedInteger", "SVGAnimatedNumber", "SVGAnimatedLength", "SVGAnimatedAngle", "SVGAnimatedString", "SVGAnimatedRect", "SVGAnimatedNumberList", "SVGAnimatedLengthList", "SVGUnitTypes", "SVGSVGElement", "SVGGElement", "SVGDefsElement", "SVGDescElement", "SVGMetadataElement", "SVGTitleElement", "SVGSymbolElement", "SVGUseElement", "SVGUseElementShadowRoot", "ShadowAnimation", "SVGSwitchElement", "SVGStyleElement", "SVGTransform", "SVGTransformList", "SVGAnimatedTransformList", "SVGPreserveAspectRatio", "SVGAnimatedPreserveAspectRatio", "SVGPathElement", "SVGRectElement", "SVGCircleElement", "SVGEllipseElement", "SVGLineElement", "SVGPointList", "SVGPolylineElement", "SVGPolygonElement", "SVGTextContentElement", "SVGTextPositioningElement", "SVGTextElement", "SVGTSpanElement", "SVGTextPathElement", "SVGImageElement", "SVGForeignObjectElement", "SVGMarkerElement", "SVGGradientElement", "SVGLinearGradientElement", "SVGRadialGradientElement", "SVGStopElement", "SVGPatternElement", "SVGScriptElement", "SVGAElement", "SVGViewElement"]
+    },
+    {
+      title: 'SVG Animations Level 2',
+      spec: 'https://svgwg.org/specs/animations/#IDL',
+      filter: "[...document.querySelectorAll('.toc li')].filter(ele => /^5\.\d/i.test(ele.innerText)).map(ele => ele.innerText.split(/interface\s*/i)[1]).sort()",
+      names: ["SVGAnimateElement", "SVGAnimateMotionElement", "SVGAnimateTransformElement", "SVGAnimationElement", "SVGDiscardElement", "SVGMPathElement", "SVGSVGElement", "SVGSetElement", "TimeEvent"]
+    },
+    {
+      title: 'Filter Effects Module Level 1',
+      spec: 'https://drafts.fxtf.org/filter-effects/#idl-index',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["SVGComponentTransferFunctionElement", "SVGFEBlendElement", "SVGFEColorMatrixElement", "SVGFEComponentTransferElement", "SVGFECompositeElement", "SVGFEConvolveMatrixElement", "SVGFEDiffuseLightingElement", "SVGFEDisplacementMapElement", "SVGFEDistantLightElement", "SVGFEDropShadowElement", "SVGFEFloodElement", "SVGFEFuncAElement", "SVGFEFuncBElement", "SVGFEFuncGElement", "SVGFEFuncRElement", "SVGFEGaussianBlurElement", "SVGFEImageElement", "SVGFEMergeElement", "SVGFEMergeNodeElement", "SVGFEMorphologyElement", "SVGFEOffsetElement", "SVGFEPointLightElement", "SVGFESpecularLightingElement", "SVGFESpotLightElement", "SVGFETileElement", "SVGFETurbulenceElement", "SVGFilterElement", "SVGFilterPrimitiveStandardAttributes"]
+    },
+    {
+      title: 'CSS Masking Module Level 1',
+      spec: 'https://drafts.fxtf.org/css-masking-1/#idl-index',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["SVGClipPathElement", "SVGMaskElement"]
+    },
+    {
+      title: '事件相关',
+      filterFunc: name => /^on/i.test(name)
+    },
+    {
+      title: 'Node(大部分与 HTML、SVG、事件 重叠，已被清除)',
+      spec: 'https://html.spec.whatwg.org',
+      filterFunc: (e) => {
+        try {
+            return (window[e].prototype instanceof Node)
+        } catch (err) {
+            return true;
+        }
+      }
+    },
+    {
       title: 'Notifications API',
       spec: 'https://notifications.spec.whatwg.org/',
       filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
@@ -135,40 +180,6 @@
       title: 'ECMAScript® 2021 Internationalization API Specification',
       spec: 'https://tc39.es/ecma402/#intl-object',
       names: ["Intl"]
-    },
-    {
-      title: 'Scalable Vector Graphics (SVG) 1.1 (Second Edition)',
-      spec: 'https://www.w3.org/TR/SVG11/single-page.html',
-      filter: "[...document.querySelectorAll('.toc li')].filter(ele => /^\d+\.\d+\.\d+\sInterface\s/.test(ele.innerText)).map(ele => ele.innerText.split(' ')[2])",
-      names: ["SVGAngle", "SVGAnimatedAngle", "SVGAnimatedBoolean", "SVGAnimatedEnumeration", "SVGAnimatedInteger", "SVGAnimatedLength", "SVGAnimatedLengthList", "SVGAnimatedNumber", "SVGAnimatedNumberList", "SVGAnimatedRect", "SVGAnimatedString", "SVGCSSRule", "SVGColor", "SVGElement", "SVGExternalResourcesRequired", "SVGFitToViewBox", "SVGICCColor", "SVGLangSpace", "SVGLength", "SVGLengthList", "SVGLocatable", "SVGNumber", "SVGNumberList", "SVGRect", "SVGRenderingIntent", "SVGStringList", "SVGStylable", "SVGTests", "SVGTransformable", "SVGURIReference", "SVGUnitTypes", "SVGViewSpec", "SVGZoomAndPan"]
-    },
-    {
-      title: 'https://svgwg.org/svg2-draft/Overview.html',
-      spec: 'https://svgwg.org/svg2-draft/idlindex.html',
-      filter: "[...document.querySelectorAll('.toc li')].filter(ele => /^\d+\.\d+\.\d+\.\sInterface\s/.test(ele.innerText)).map(ele => ele.innerText.split(/\s/)[2])",
-      names: ["SVGElement", "SVGGraphicsElement", "SVGGeometryElement", "SVGNumber", "SVGLength", "SVGAngle", "SVGNumberList", "SVGLengthList", "SVGStringList", "SVGAnimatedBoolean", "SVGAnimatedEnumeration", "SVGAnimatedInteger", "SVGAnimatedNumber", "SVGAnimatedLength", "SVGAnimatedAngle", "SVGAnimatedString", "SVGAnimatedRect", "SVGAnimatedNumberList", "SVGAnimatedLengthList", "SVGUnitTypes", "SVGSVGElement", "SVGGElement", "SVGDefsElement", "SVGDescElement", "SVGMetadataElement", "SVGTitleElement", "SVGSymbolElement", "SVGUseElement", "SVGUseElementShadowRoot", "ShadowAnimation", "SVGSwitchElement", "SVGStyleElement", "SVGTransform", "SVGTransformList", "SVGAnimatedTransformList", "SVGPreserveAspectRatio", "SVGAnimatedPreserveAspectRatio", "SVGPathElement", "SVGRectElement", "SVGCircleElement", "SVGEllipseElement", "SVGLineElement", "SVGPointList", "SVGPolylineElement", "SVGPolygonElement", "SVGTextContentElement", "SVGTextPositioningElement", "SVGTextElement", "SVGTSpanElement", "SVGTextPathElement", "SVGImageElement", "SVGForeignObjectElement", "SVGMarkerElement", "SVGGradientElement", "SVGLinearGradientElement", "SVGRadialGradientElement", "SVGStopElement", "SVGPatternElement", "SVGScriptElement", "SVGAElement", "SVGViewElement"]
-    },
-    {
-      title: 'SVG Animations Level 2',
-      spec: 'https://svgwg.org/specs/animations/#IDL',
-      filter: "[...document.querySelectorAll('.toc li')].filter(ele => /^5\.\d/i.test(ele.innerText)).map(ele => ele.innerText.split(/interface\s*/i)[1]).sort()",
-      names: ["SVGAnimateElement", "SVGAnimateMotionElement", "SVGAnimateTransformElement", "SVGAnimationElement", "SVGDiscardElement", "SVGMPathElement", "SVGSVGElement", "SVGSetElement", "TimeEvent"]
-    },
-    {
-      title: 'Filter Effects Module Level 1',
-      spec: 'https://drafts.fxtf.org/filter-effects/#idl-index',
-      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
-      names: ["SVGComponentTransferFunctionElement", "SVGFEBlendElement", "SVGFEColorMatrixElement", "SVGFEComponentTransferElement", "SVGFECompositeElement", "SVGFEConvolveMatrixElement", "SVGFEDiffuseLightingElement", "SVGFEDisplacementMapElement", "SVGFEDistantLightElement", "SVGFEDropShadowElement", "SVGFEFloodElement", "SVGFEFuncAElement", "SVGFEFuncBElement", "SVGFEFuncGElement", "SVGFEFuncRElement", "SVGFEGaussianBlurElement", "SVGFEImageElement", "SVGFEMergeElement", "SVGFEMergeNodeElement", "SVGFEMorphologyElement", "SVGFEOffsetElement", "SVGFEPointLightElement", "SVGFESpecularLightingElement", "SVGFESpotLightElement", "SVGFETileElement", "SVGFETurbulenceElement", "SVGFilterElement", "SVGFilterPrimitiveStandardAttributes"]
-    },
-    {
-      title: 'CSS Masking Module Level 1',
-      spec: 'https://drafts.fxtf.org/css-masking-1/#idl-index',
-      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
-      names: ["SVGClipPathElement", "SVGMaskElement"]
-    },
-    {
-      title: '事件相关',
-      filterFunc: name => /^on/i.test(name)
     },
     {
       title: 'CSS namespace',
@@ -516,7 +527,8 @@
     console.log(names);
     let p;
     p = document.createElement('p');
-    p.innerHTML = '剩余属性(共' + names.length + '个)：' + names.sort().join(', ');
+    p.style.color = 'red';
+    p.innerHTML = '剩余未分类属性(共' + names.length + '个)：' + names.sort().join(', ');
     resultDom.append(p);
   </script>
 </body>

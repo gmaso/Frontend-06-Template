@@ -220,7 +220,11 @@ element 对象：scrollTop、scrollLeft、scrollWidth、scrollHeight、scroll(x,
 
 整理心得：
 - 发现 window 下的属性来自很多不同的组织、不同的规范
-- 规范的状态也有所不同，如推荐、候选、工作组、社区组等
+- 规范的状态也有所不同，如 Recommendation、Proposed Recommendation、Working Draft、Editor's Draft、Unoffical Draft 等
 - 有些规范已经较长事件没更新，可能不会称为正式标准
 - 有些属性已经废弃，由于兼容性或时间原因，还保留在 window 中
+- 规范中有些属性，浏览器还没有实现，尤其是比较早期的规范
+- 浏览器已经添加了很多很多的接口 API，如支付、地理位置、投影、蓝牙、语音、XR 等，但还没有被充分发挥
 - 碰到不了解的属性，应该首先查询 MDN，了解属性来源于什么规范、解决什么问题、当前状态
+- HTML Live Standard 包含好多东西，而且 DOM 结构好复杂，好难用 js 提取，单页打开搜索又太卡，哈哈😂
+- 大部分 W3C 相关的标准，可以参看目录最后的 IDL Index 子目录，里面包含接口和方法的定义

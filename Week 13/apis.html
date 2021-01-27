@@ -87,7 +87,7 @@
       // localStorage 和 sessionStorage 是 getter，手动添加
       names: ["AudioTrack", "AudioTrackList", "BarProp", "BeforeUnloadEvent", "BroadcastChannel", "CanvasGradient", "CanvasPattern", "CanvasRenderingContext2D", "CloseEvent", "CustomElementRegistry", "DOMParser", "DOMStringList", "DOMStringMap", "DataTransfer", "DataTransferItem", "DataTransferItemList", "DedicatedWorkerGlobalScope", "Document", "DragEvent", "ElementInternals", "ErrorEvent", "EventSource", "External", "FormDataEvent", "HTMLAllCollection", "HTMLAnchorElement", "HTMLAreaElement", "HTMLAudioElement", "HTMLBRElement", "HTMLBaseElement", "HTMLBodyElement", "HTMLButtonElement", "HTMLCanvasElement", "HTMLDListElement", "HTMLDataElement", "HTMLDataListElement", "HTMLDetailsElement", "HTMLDialogElement", "HTMLDirectoryElement", "HTMLDivElement", "HTMLElement", "HTMLEmbedElement", "HTMLFieldSetElement", "HTMLFontElement", "HTMLFormControlsCollection", "HTMLFormElement", "HTMLFrameElement", "HTMLFrameSetElement", "HTMLHRElement", "HTMLHeadElement", "HTMLHeadingElement", "HTMLHtmlElement", "HTMLIFrameElement", "HTMLImageElement", "HTMLInputElement", "HTMLLIElement", "HTMLLabelElement", "HTMLLegendElement", "HTMLLinkElement", "HTMLMapElement", "HTMLMarqueeElement", "HTMLMediaElement", "HTMLMenuElement", "HTMLMetaElement", "HTMLMeterElement", "HTMLModElement", "HTMLOListElement", "HTMLObjectElement", "HTMLOptGroupElement", "HTMLOptionElement", "HTMLOptionsCollection", "HTMLOutputElement", "HTMLParagraphElement", "HTMLParamElement", "HTMLPictureElement", "HTMLPreElement", "HTMLProgressElement", "HTMLQuoteElement", "HTMLScriptElement", "HTMLSelectElement", "HTMLSlotElement", "HTMLSourceElement", "HTMLSpanElement", "HTMLStyleElement", "HTMLTableCaptionElement", "HTMLTableCellElement", "HTMLTableColElement", "HTMLTableElement", "HTMLTableRowElement", "HTMLTableSectionElement", "HTMLTemplateElement", "HTMLTextAreaElement", "HTMLTimeElement", "HTMLTitleElement", "HTMLTrackElement", "HTMLUListElement", "HTMLUnknownElement", "HTMLVideoElement", "HashChangeEvent", "History", "ImageBitmap", "ImageBitmapRenderingContext", "ImageData", "Location", "MediaError", "MessageChannel", "MessageEvent", "MessagePort", "MimeType", "MimeTypeArray", "Navigator", "OffscreenCanvas", "OffscreenCanvasRenderingContext2D", "PageTransitionEvent", "Path2D", "Plugin", "PluginArray", "PopStateEvent", "PromiseRejectionEvent", "RadioNodeList", "SharedWorker", "SharedWorkerGlobalScope", "Storage", "StorageEvent", "SubmitEvent", "TextMetrics", "TextTrack", "TextTrackCue", "TextTrackCueList", "TextTrackList", "TimeRanges", "TrackEvent", "ValidityState", "VideoTrack", "VideoTrackList", "WebSocket", "Window", "Worker", "WorkerGlobalScope", "WorkerLocation", "WorkerNavigator", "Worklet", "WorkletGlobalScope", "localStorage", "sessionStorage"].concat([
       "alert", "atob", "btoa", "clearInterval", "clearTimeout", "close", "closed", "confirm", "createImageBitmap", "crossOriginIsolated", "customElements", "document", "focus", "frameElement", "frames", "history", "isSecureContext", "length", "localStorage", "location", "locationbar", "menubar", "name", "navigator", "open", "opener", "origin", "originAgentCluster", "parent", "personalbar", "postMessage", "print", "prompt", "queueMicrotask", "scrollbars", "self", "sessionStorage", "setInterval", "setTimeout", "statusbar", "stop", "toolbar", "top", "window"
-      ])
+      ]).concat(["requestAnimationFrame"])
     },
     {
       title: 'Scalable Vector Graphics (SVG) 1.1 (Second Edition)',
@@ -330,10 +330,33 @@
       names: ["Baseline", "Font", "FontMetrics"]
     },
     {
+      title: 'WebXR Device API',
+      spec: 'https://immersive-web.github.io/webxr/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["XRBoundedReferenceSpace", "XRFrame", "XRInputSource", "XRInputSourceArray", "XRInputSourceEvent", "XRInputSourcesChangeEvent", "XRLayer", "XRPermissionStatus", "XRPose", "XRReferenceSpace", "XRReferenceSpaceEvent", "XRRenderState", "XRRigidTransform", "XRSession", "XRSessionEvent", "XRSpace", "XRSystem", "XRView", "XRViewerPose", "XRViewport", "XRWebGLLayer"]
+    },
+    {
       title: 'WebXR Hit Test Module',
       spec: 'https://immersive-web.github.io/hit-test/',
       filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
       names: ["XRHitTestResult", "XRHitTestSource", "XRRay", "XRTransientInputHitTestResult", "XRTransientInputHitTestSource"]
+    },
+    {
+      title: 'WebXR Layers API Level 1',
+      spec: 'https://immersive-web.github.io/layers/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["XRCompositionLayer", "XRCubeLayer", "XRCylinderLayer", "XREquirectLayer", "XRLayerEvent", "XRMediaBinding", "XRProjectionLayer", "XRQuadLayer", "XRSubImage", "XRWebGLBinding", "XRWebGLSubImage"]
+    },
+    {
+      title: 'WebXR Anchors Module',
+      spec: 'https://immersive-web.github.io/anchors/',
+      filter: "[...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort()",
+      names: ["XRAnchor", "XRAnchorSet"]
+    },
+    {
+      title: 'WebXR DOM Overlays Module',
+      spec: 'https://immersive-web.github.io/dom-overlays/',
+      names: ["XRDOMOverlayState"]
     },
     {
       title: 'Media Capture and Streams',
@@ -452,7 +475,7 @@
       title: 'Web Speech API',
       spec: 'https://wicg.github.io/speech-api/',
       filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
-      names: ["SpeechGrammar", "SpeechGrammarList", "SpeechRecognition", "SpeechRecognitionAlternative", "SpeechRecognitionErrorEvent", "SpeechRecognitionEvent", "SpeechRecognitionResult", "SpeechRecognitionResultList", "SpeechSynthesis", "SpeechSynthesisErrorEvent", "SpeechSynthesisEvent", "SpeechSynthesisUtterance", "SpeechSynthesisVoice"]
+      names: ["SpeechGrammar", "SpeechGrammarList", "SpeechRecognition", "SpeechRecognitionAlternative", "SpeechRecognitionErrorEvent", "SpeechRecognitionEvent", "SpeechRecognitionResult", "SpeechRecognitionResultList", "SpeechSynthesis", "SpeechSynthesisErrorEvent", "SpeechSynthesisEvent", "SpeechSynthesisUtterance", "SpeechSynthesisVoice"].concat(["speechSynthesis"])
     },
     {
       title: 'Web Cryptography API',
@@ -502,6 +525,39 @@
       names: ["ResizeObservation", "ResizeObserver", "ResizeObserverEntry", "ResizeObserverSize"]
     },
     {
+      title: 'Cooperative Scheduling of Background Tasks',
+      spec: 'https://www.w3.org/TR/requestidlecallback/',
+      names: ["requestIdleCallback", "cancelIdleCallback", "IdleDeadline"]
+    },
+    {
+      title: 'Media Session Standard',
+      spec: 'https://w3c.github.io/mediasession/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["MediaMetadata", "MediaSession"]
+    },
+    {
+      title: 'Media Capabilities',
+      spec: 'https://w3c.github.io/media-capabilities/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["MediaCapabilities"]
+    },
+    {
+      title: 'Media Source Extensions',
+      spec: 'https://w3c.github.io/media-source/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["MediaSource", "SourceBuffer", "SourceBufferList"]
+    },
+    {
+      title: 'MediaStreamEvent 已废弃',
+      names: ["MediaStreamEvent"]
+    },
+    {
+      title: 'File System Access',
+      spec: 'https://wicg.github.io/file-system-access/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["FileSystemDirectoryHandle", "FileSystemFileHandle", "FileSystemHandle", "FileSystemWritableFileStream"].concat(["showOpenFilePicker", "showSaveFilePicker", "showDirectoryPicker"])
+    },
+    {
       title: 'Performance',
       filterFunc: name => /^Performance/i.test(name)
     },
@@ -514,13 +570,58 @@
       filterFunc: name => /^Cookie/i.test(name)
     },
     {
-      title: 'RTC',
-      filterFunc: name => /^RTC/i.test(name)
+      title: 'Web Background Synchronization',
+      spec: 'https://wicg.github.io/background-sync/spec/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["SyncEvent", "SyncManager"]
     },
     {
-      title: 'Payment',
-      filterFunc: name => /^Payment/i.test(name)
-    }];
+      title: 'Screen Wake Lock API',
+      spec: 'https://w3c.github.io/screen-wake-lock/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["WakeLock", "WakeLockSentinel"]
+    },
+    {
+      title: 'Clipboard API and events',
+      spec: 'https://w3c.github.io/clipboard-apis/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["Clipboard", "ClipboardEvent", "ClipboardItem"]
+    },
+    {
+      title: 'MediaStream Recording',
+      spec: 'https://w3c.github.io/mediacapture-record/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["BlobEvent", "MediaRecorder", "MediaRecorderErrorEvent"]
+    },
+    {
+      title: 'WebRTC Insertable Media using Streams',
+      spec: 'https://w3c.github.io/webrtc-insertable-streams/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["RTCEncodedAudioFrame", "RTCEncodedVideoFrame"]
+    },
+    {
+      title: 'Intersection Observer',
+      spec: 'https://w3c.github.io/IntersectionObserver/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["IntersectionObserver", "IntersectionObserverEntry", "IntersectionObserverRegistration"]
+    },
+    {
+      title: 'Payment Handler API',
+      spec: 'https://www.w3.org/TR/payment-handler/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["CanMakePaymentEvent", "PaymentInstruments", "PaymentManager", "PaymentRequestEvent"]
+    },
+    {
+      title: 'Payment Request API',
+      spec: 'https://w3c.github.io/payment-request/',
+      filter: "[...new Set([...document.querySelectorAll('[data-dfn-type=\"interface\"] code')].map(ele => ele.innerText).sort())]",
+      names: ["PaymentAddress", "PaymentMethodChangeEvent", "PaymentRequest", "PaymentRequestUpdateEvent", "PaymentResponse"]
+    },
+    {
+      title: 'webkit 私有属性和实现',
+      filterFunc: name => /^webkit/i.test(name)
+    },
+    ];
 
     filterOut(specs);
 

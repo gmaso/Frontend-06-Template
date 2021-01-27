@@ -13,7 +13,7 @@
 
     // 获取当前环境的所有属性名称
     let names = Object.getOwnPropertyNames(globalThis);
-    let resultDom = document.querySelector('.result');
+    let resultDom = document.querySelector('.result') || document.createElement('div');
 
     function filterOut(specs) {
       specs.forEach(specObj => {
@@ -44,7 +44,8 @@
           specNames.map(name => map.set(name));
           names = names.filter(name => !map.has(name));
         }
-        p.innerHTML = '属性(共' + specNames.length + '个)：' + specNames.join(', ') + '<br><br>'
+        p.innerHTML = '属性(共' + specNames.length + '个)：' + specNames.join(', ') + '<br><br>';
+        console.log(specObj.title, specUrl, specNames);
         resultDom.append(p);
       });
       
@@ -625,12 +626,12 @@
 
     filterOut(specs);
 
-    console.log(names);
     let p;
     p = document.createElement('p');
     p.style.color = 'red';
     p.innerHTML = '剩余未分类属性(共' + names.length + '个)：' + names.sort().join(', ');
     resultDom.append(p);
+    console.warn('剩余未分类属性(共' + names.length + '个)：', names.sort());
   </script>
 </body>
 </html>

@@ -17,25 +17,57 @@ class Carousel extends Component {
       img.style.backgroundSize = 'contain';
       this.root.appendChild(img);
     }
-    
-    let currentIndex = 0;
-    setInterval(() => {
+
+    let position = 0;
+    this.root.addEventListener('mousedown', event => {
       let children = this.root.children;
-      let nextIndex = (currentIndex + 1) % children.length;
-      let current = children[currentIndex];
-      let next = children[nextIndex];
+      let startX = event.clientX;
 
-      next.style.transition = 'none';
-      next.style.transform = `translateX(${100 - nextIndex * 100}%)`;
+      let move = event => {
+        let x = event.clientX - startX;
 
-      setTimeout(() => {
-        next.style.transition = '';
-        current.style.transform = `translateX(${-100 - currentIndex * 100}%)`;
-        next.style.transform = `translateX(${- nextIndex * 100}%)`;
-        currentIndex = nextIndex;
-      }, 16);
+        for (let child of children) {
+          child.style.transition = 'none';
+          child.style.transform = `translateX(${-position * 500 + x}px)`;
+        }
+      }
+
+      let up = event => {
+        // 移动到最近一张
+        let x = event.clientX - startX;
+        position = position - Math.round(x / 500);
+        for (let child of children) {
+          child.style.transition = '';
+          child.style.transform = `translateX(${-position * 500}px)`;
+        }
+        document.removeEventListener('mousemove', move);
+        document.removeEventListener('mouseup', up);
+      }
+
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', up);
+
+
+    });
+    
+    // let currentIndex = 0;
+    // setInterval(() => {
+    //   let children = this.root.children;
+    //   let nextIndex = (currentIndex + 1) % children.length;
+    //   let current = children[currentIndex];
+    //   let next = children[nextIndex];
+
+    //   next.style.transition = 'none';
+    //   next.style.transform = `translateX(${100 - nextIndex * 100}%)`;
+
+    //   setTimeout(() => {
+    //     next.style.transition = '';
+    //     current.style.transform = `translateX(${-100 - currentIndex * 100}%)`;
+    //     next.style.transform = `translateX(${- nextIndex * 100}%)`;
+    //     currentIndex = nextIndex;
+    //   }, 16);
       
-    }, 3000);
+    // }, 3000);
 
     return this.root;
   }

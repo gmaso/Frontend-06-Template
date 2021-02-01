@@ -23,7 +23,7 @@ export function createElement(type, attributes, ...children) {
 
 export class Component {
   constructor() {
-    this.root = this.render();
+    
   }
 
   setAttribute(name, value) {

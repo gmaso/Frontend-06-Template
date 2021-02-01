@@ -3,17 +3,30 @@ import {Component, createElement} from './framework.js';
 class Carousel extends Component {
   constructor() {
     super();
+    this.attributes = Object.create(null);
+  }
+  setAttribute(name, value) {
+    this.attributes[name] = value;
   }
   render() {
-    return document.createElement('div');
+    this.root = document.createElement('div');
+    for (let src of this.attributes.src) {
+      let img = document.createElement('img');
+      img.src = src;
+      this.root.appendChild(img);
+    }
+    return this.root;
+  }
+  mountTo(parent) {
+    parent.appendChild(this.render());
   }
 }
 
-let a = <Carousel id="a">
-    <span>a</span>
-    <span>b</span>
-    <span>c</span>
-    <span>d</span>
+let d = [
+  'images/1.jpg', 'images/2.jpg', 'images/3.jpg', 'images/4.jpg'
+];
+
+let a = <Carousel src={d}>
     </Carousel>
 
 // document.body.appendChild(a);

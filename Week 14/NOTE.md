@@ -69,7 +69,18 @@ Template 型：模板，需要和数据结合才能决定显示元素的个数
 #### 配置 JSX 步骤
 
 1. npm install -g webpack webpack-cli
+
 2. npm install --save-dev webpack babel-loader
+
 3. npm install --save-dev @babel/core @babel/preset-env
-4.  npm install --save-dev @babel/plugin-transform-react-jsx
+
+4. npm install --save-dev @babel/plugin-transform-react-jsx
+
 5. 配置 webpack 和 jsx
+
+   注意：由于 webpack 升级到 5.x，需要配套安装 webpack-cli@3。
+
+
+
+## 轮播组件 Carousel
+

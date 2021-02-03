@@ -40,3 +40,16 @@ let tick = () => {
 
 每帧给一个图
 
+
+
+构造两个类：
+
+1. Animation 动画类，动过参数初始化后，传入时间点 time 可以获取到对应的属性值
+2. Timeline 时间线类，动态调用 Animation 类
+
+
+
+## 手势与动画 | 设计时间线的更新
+
+加强时间线，支持在 Timeline 开始后动态添加 Animation。
+

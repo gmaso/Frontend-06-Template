@@ -13,9 +13,13 @@ let a = <Carousel src={d}>
 
 a.mountTo(document.body);
 
-let am = new Animation({a: 5}, 'a', 5, 100, 1000);
 
 let tl = new Timeline();
-
-tl.add(am);
+window.tl = tl;
 tl.start();
+
+let am = new Animation({a: 5}, 'a', 5, 100, 1000);
+window.am = am;
+
+// 动态添加 amination
+tl.add(am);

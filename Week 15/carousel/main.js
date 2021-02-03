@@ -18,7 +18,7 @@ let tl = new Timeline();
 window.tl = tl;
 tl.start();
 
-let am = new Animation({a: 5}, 'a', 5, 100, 1000);
+let am = new Animation({a: 5}, 'a', 5, 1000, 5000);
 window.am = am;
 
 // 动态添加 amination

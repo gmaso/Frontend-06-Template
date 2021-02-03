@@ -2,6 +2,8 @@ const TICK = Symbol('tick');
 const TICK_HANDLER = Symbol('tick-handler');
 const ANIMATIONS = Symbol('animations');
 const START_TIMES = Symbol('start-times');
+const PAUSE_START = Symbol('pause-start');
+const PAUSE_TIME = Symbol('pause-time');
 
 // 动态调用属性动画，得到帧
 export class Timeline {
@@ -13,6 +15,7 @@ export class Timeline {
   // 开始播放
   start () {
     let startTime = Date.now();
+    this[PAUSE_TIME] = 0;
     // 使用 Symbol 保存属性，避免外部访问到此方法
     this[TICK] = () => {
       // console.log('tick');
@@ -20,9 +23,9 @@ export class Timeline {
       for (let animation of this[ANIMATIONS]) {
         let t;
         if (this[START_TIMES].get(animation) < startTime) {
-          t = now - startTime;
+          t = now - startTime - this[PAUSE_TIME];;
         } else {
-          t = now - this[START_TIMES].get(animation);
+          t = now - this[START_TIMES].get(animation) - this[PAUSE_TIME];
         }
         if (animation.duration < t) {
           this[ANIMATIONS].delete(animation);
@@ -31,19 +34,22 @@ export class Timeline {
         }
         animation.receive(t)
       }
-      requestAnimationFrame(this[TICK]);
+      this[TICK_HANDLER] = requestAnimationFrame(this[TICK]);
     }
     this[TICK]();
   }
 
   // 暂停
   pause () {
-
+    this[PAUSE_START] = Date.now();
+    cancelAnimationFrame(this[TICK_HANDLER]);
   }
 
-  // 恢复
+  // 重启
   resume () {
-
+    this[PAUSE_TIME] += this[PAUSE_START] ? Date.now() - this[PAUSE_START] : 0;
+    this[PAUSE_START] = 0;
+    this[TICK]();
   }
 
   // 倍数

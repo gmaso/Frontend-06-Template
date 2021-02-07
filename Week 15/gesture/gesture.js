@@ -75,7 +75,14 @@ element.addEventListener('touchcancel', event => {
 
 let start = (point, context) => {
   // console.log('start', point.clientX, point.clientY);
-  startX = point.clientX, startY = point.clientY;
+  context.startX = point.clientX, context.startY = point.clientY;
+  context.points = [
+    {
+      t: Date.now(),
+      x: point.clientX,
+      y: point.clientY
+    }
+  ];
   context.isTap = true;
   context.isPan = false;
   context.isPress = false;
@@ -90,8 +97,8 @@ let start = (point, context) => {
 };
 let move = (point, context) => {
   // console.log('move', point.clientX, point.clientY);
-  let dx = point.clientX - startX;
-  let dy = point.clientY - startY;
+  let dx = point.clientX - context.startX;
+  let dy = point.clientY - context.startY;
   if (!context.isPan && dx ** 2 + dy ** 2 > 100) {
     context.isTap = false;
     context.isPan = true;
@@ -103,6 +110,13 @@ let move = (point, context) => {
     console.log('pan', dx, dy);
     console.log('pan');
   }
+  // 保留 500ms 内的点
+  context.points = context.points.filter(point => Date.now() - point.t < 500);
+  context.points.push({
+      t: Date.now(),
+      x: point.clientX,
+      y: point.clientY
+    });
 };
 let end = (point, context) => {
   if (context.isTap) {
@@ -117,6 +131,22 @@ let end = (point, context) => {
     console.log('pressend');
   }
   console.log('end', point.clientX, point.clientY);
+
+  context.points = context.points.filter(point => Date.now() - point.t < 500);
+  let d, v;
+  if (!context.points.length) {
+    v = 0;
+  } else {
+    d = Math.sqrt((point.clientX - context.points[0].x) ** 2 + (point.clientY - context.points[0].y) ** 2);
+    v = d / (Date.now() - context.points[0].t);
+  }
+  // 速度大于 1.5px/ms，就可以认为是比较快地划过了
+  if (v > 1.5) {
+    console.log('flick');
+    contenxt.isFlick = true;
+  } else {
+    context.isFlick = false;
+  }
 };
 let cancel = (point, context) => {
   clearTimeout(context.handler);

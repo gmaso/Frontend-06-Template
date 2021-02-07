@@ -100,3 +100,12 @@ touch 事件一旦 start 后，move 一定触发在同一个元素上，不管�
 touch 事件可以有多个触点，保存在 event.changedTouches 中，是一系列的 touch 对象，其中有 identifier 参数唯一标识触点。
 
 touchcancel 事件，当被异常打断时触发，比如 alert。
+
+
+
+## 手势与动画 | 实现手势的逻辑
+
+判断手势状态触发的事件。
+
+
+

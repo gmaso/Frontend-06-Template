@@ -118,3 +118,14 @@ touchcancel 事件，当被异常打断时触发，比如 alert。
 坑：event.button 和 event.buttons 中的右键和中键是反的。
 
 当多个键同时按下时，会多次绑定事件
+
+
+
+## 手势与动画 | 事件派发
+
+生成一个 event 事件，并使用 dispatchEvent 派发到 element 上。
+
+
+
+手势与动画 | 实现一个 flick
+

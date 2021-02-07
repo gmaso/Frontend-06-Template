@@ -1,3 +1,5 @@
+import {linear} from './case.js';
+
 const TICK = Symbol('tick');
 const TICK_HANDLER = Symbol('tick-handler');
 const ANIMATIONS = Symbol('animations');
@@ -8,12 +10,17 @@ const PAUSE_TIME = Symbol('pause-time');
 // 动态调用属性动画，得到帧
 export class Timeline {
   constructor () {
+    this.state = 'inited';
     this[ANIMATIONS] = new Set();
     this[START_TIMES] = new Map();
   }
 
   // 开始播放
   start () {
+    if (this.state !== 'inited') {
+      return;
+    }
+    this.state = 'started';
     let startTime = Date.now();
     this[PAUSE_TIME] = 0;
     // 使用 Symbol 保存属性，避免外部访问到此方法
@@ -23,16 +30,18 @@ export class Timeline {
       for (let animation of this[ANIMATIONS]) {
         let t;
         if (this[START_TIMES].get(animation) < startTime) {
-          t = now - startTime - this[PAUSE_TIME];;
+          t = now - startTime - this[PAUSE_TIME] - animation.delay;
         } else {
-          t = now - this[START_TIMES].get(animation) - this[PAUSE_TIME];
+          t = now - this[START_TIMES].get(animation) - this[PAUSE_TIME] - animation.delay;
         }
         if (animation.duration < t) {
           this[ANIMATIONS].delete(animation);
           // 避免超出范围
           t = animation.duration;
         }
-        animation.receive(t)
+        if (t > 0) {
+          animation.receive(t)
+        }
       }
       this[TICK_HANDLER] = requestAnimationFrame(this[TICK]);
     }
@@ -41,15 +50,21 @@ export class Timeline {
 
   // 暂停
   pause () {
-    this[PAUSE_START] = Date.now();
-    cancelAnimationFrame(this[TICK_HANDLER]);
+    if (this.state === 'started') {
+      this.state = 'paused';
+      this[PAUSE_START] = Date.now();
+      cancelAnimationFrame(this[TICK_HANDLER]);
+    }
   }
 
   // 重启
   resume () {
-    this[PAUSE_TIME] += this[PAUSE_START] ? Date.now() - this[PAUSE_START] : 0;
-    this[PAUSE_START] = 0;
-    this[TICK]();
+    if (this.state === 'paused') {
+      this.state = 'started';
+      this[PAUSE_TIME] += this[PAUSE_START] ? Date.now() - this[PAUSE_START] : 0;
+      this[PAUSE_START] = 0;
+      this[TICK]();
+    }
   }
 
   // 倍数
@@ -61,7 +76,13 @@ export class Timeline {
   // }
 
   reset () {
-
+    this.pause();
+    this.state = 'inited';
+    this[ANIMATIONS] = new Set();
+    this[START_TIMES] = new Map();
+    this[PAUSE_START] = 0;
+    this[PAUSE_TIME] = 0;
+    this[TICK_HANDLER] = null;
   }
 
   add(animation, startTime) {
@@ -79,7 +100,7 @@ export class Timeline {
 // 传入时间点，返回对应属性值
 export class Animation {
   // 暂不考虑数值单位问题
-  constructor (object, property, startValue, endValue, duration, delay, timingFunction) {
+  constructor (object, property, startValue, endValue, duration, delay, timingFunction, template) {
     this.object = object;
     this.property = property;
     this.startValue = startValue;
@@ -87,10 +108,12 @@ export class Animation {
     this.duration = duration;
     this.delay = delay;
     this.range = this.endValue - this.startValue;
-    this.timingFunction = timingFunction;
+    this.timingFunction = timingFunction || (v => v);
+    this.template = template || (v => v);
   }
   receive (time) {
-    this.object[this.property] = this.startValue + this.range * time / this.duration;
+    let progress = this.timingFunction(time / this.duration);
+    this.object[this.property] = this.template(this.startValue + this.range * progress);
     console.log(time, this.object[this.property]);
   }
 }

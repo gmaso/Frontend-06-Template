@@ -77,3 +77,26 @@ let tick = () => {
 
 
 
+## 手势与动画 | 手势的基本知识
+
+由于鼠标尤其是触屏上操作精确性问题和差异性，用手势来统一操作，简化代码。
+
+抽象到 start、move、end 事件中。
+
+对 move 判断有一个容差，一般使用 5px（一倍屏），低于此值不判断为移动。
+
+flick：类似 swipe，扫一下
+
+![image-20210207214704087](http://static.gmaso.cn/blog/2021/02/07/21/3242703de99a2e9af22318761b644408-c053a8-image-20210207214704087.png?imageslim)
+
+
+
+## 手势与动画 | 实现鼠标操作
+
+移动端操作不会触发 mouse 系列事件。
+
+touch 事件一旦 start 后，move 一定触发在同一个元素上，不管手移动到哪里。由于 move 肯定在 start 后才能触发，所以事件可以一起添加。而不像 mousemove，在没有 mousedown 时也能触发，所以必须在 mousedown 后才监听。
+
+touch 事件可以有多个触点，保存在 event.changedTouches 中，是一系列的 touch 对象，其中有 identifier 参数唯一标识触点。
+
+touchcancel 事件，当被异常打断时触发，比如 alert。

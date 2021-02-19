@@ -1,20 +1,19 @@
-import {Component} from './framework.js';
+import {Component, ATTRIBUTE, STATE} from './framework.js';
 import {enableGesture} from './gesture.js';
 import {Animation,Timeline} from './animation.js';
 import {ease} from './case.js';
 
+// 往外部 export
+export {ATTRIBUTE, STATE} from './framework.js';
+
 export class Carousel extends Component {
   constructor() {
     super();
-    this.attributes = Object.create(null);
-  }
-  setAttribute(name, value) {
-    this.attributes[name] = value;
   }
   render() {
     this.root = document.createElement('div');
     this.root.classList.add('carousel');
-    for (let src of this.attributes.src) {
+    for (let src of this[ATTRIBUTE].src) {
       let img = document.createElement('div');
       img.style.backgroundImage = `url(${src})`;
       img.style.backgroundSize = 'contain';
@@ -26,7 +25,7 @@ export class Carousel extends Component {
     timeline.start();
 
     let children = this.root.children;
-    let position = 0;
+    this[STATE].position = 0;
     let handler = null;
     let t = 0;
     let ax = 0;
@@ -39,9 +38,17 @@ export class Carousel extends Component {
       ax = ease(progress) * 500 - 500;
     });
 
+    this.root.addEventListener('tap', event => {
+      this.triggerEvent('click', 
+      { 
+        position: this[STATE].position,
+        data: this[ATTRIBUTE].src[this[STATE].position],
+      });
+    });
+
     this.root.addEventListener('pan', event => {
       let x = event.clientX - event.startX - ax;
-      let current = position - ((x - x % 500) / 500);
+      let current = this[STATE].position - ((x - x % 500) / 500);
 
       for (let offset of [-1, 0, 1]) {
         let pos = ((current + offset) % children.length + children.length) % children.length;
@@ -57,7 +64,7 @@ export class Carousel extends Component {
       handler = setInterval(auto, 3000);
 
       let x = event.clientX - event.startX - ax;
-      let current = position - ((x - x % 500) / 500);
+      let current = this[STATE].position - ((x - x % 500) / 500);
       let direction = Math.round((x % 500) / 500);
 
       if (event.isFlick) {
@@ -79,30 +86,29 @@ export class Carousel extends Component {
           1500, 0, ease, v => `translateX(${v}px)`));
       }
 
-      position = position - ((x - x % 500) / 500) - direction;
-      position = (position % children.length + children.length) % children.length;
+      this[STATE].position = this[STATE].position - ((x - x % 500) / 500) - direction;
+      this[STATE].position = (this[STATE].position % children.length + children.length) % children.length;
+      this.triggerEvent('change', { position: this[STATE].position });
     });
 
     let auto = () => {
       let children = this.root.children;
-      let nextIndex = (position + 1) % children.length;
-      let current = children[position];
+      let nextIndex = (this[STATE].position + 1) % children.length;
+      let current = children[this[STATE].position];
       let next = children[nextIndex];
 
       t = Date.now();
 
       // 添加 amination
-      timeline.add(new Animation(current.style, 'transform', -position * 500, -500 - position * 500, 1500, 0, ease, v => `translateX(${v}px)`));
+      timeline.add(new Animation(current.style, 'transform', -this[STATE].position * 500, -500 - this[STATE].position * 500, 1500, 0, ease, v => `translateX(${v}px)`));
       timeline.add(new Animation(next.style, 'transform', 500 - nextIndex * 500,- nextIndex * 500, 1500, 0, ease, v => `translateX(${v}px)`));
 
-      position = nextIndex;
+      this[STATE].position = nextIndex;
+      this.triggerEvent('change', { position: this[STATE].position });
     }
 
     handler = setInterval(auto, 3000);
     
     return this.root;
-  }
-  mountTo(parent) {
-    parent.appendChild(this.render());
   }
 }

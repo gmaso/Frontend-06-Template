@@ -54,7 +54,7 @@ export class Listener {
           isListeningMouse = false;
         }
       };
-    
+      // TODO 某些情况下事件添加到了错误的元素上，不会触发 end
       if (!isListeningMouse) {
         document.addEventListener('mousemove', mousemove);
         document.addEventListener('mouseup', mouseup);

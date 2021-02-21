@@ -1,5 +1,6 @@
 export function createElement(type, attributes, ...children) {
   let element;
+  console.log(type)
   if (typeof type === 'string') {
     element = new ElementWrapper(type);
   } else {
@@ -10,13 +11,22 @@ export function createElement(type, attributes, ...children) {
     element.setAttribute(name, attributes[name]);
   }
 
-  for (let child of children) {
-    if (typeof child === 'string') {
-      child = new TextWrapper(child);
+  let processChildren = (children) => {
+    for (let child of children) {
+      if ((typeof child === 'object') && (child instanceof Array)) {
+        processChildren(child);
+        continue;
+      }
+      if (typeof child === 'string') {
+        child = new TextWrapper(child);
+      }
+      console.log(child)
+      // element.appendChild(child);
+      child.mountTo(element);
     }
-    console.log(child)
-    child.mountTo(element);
   }
+  processChildren(children);
+  
   return element;
 }
 
@@ -34,7 +44,14 @@ export class Component {
     this[ATTRIBUTE][name] = value;
   }
 
+  render() {
+    return this.root;
+  }
+
   appendChild(child) {
+    if (!this.root) {
+      this.render();
+    }
     this.root.appendChild(child);
   }
 
@@ -55,8 +72,9 @@ class ElementWrapper extends Component {
     super();
     this.root = document.createElement(type);
   }
-  render() {
-    return document.createElement('div');
+
+  setAttribute(name, value) {
+    this.root.setAttribute(name, value);
   }
 }
 
@@ -64,8 +82,5 @@ class TextWrapper extends Component {
   constructor(content) {
     super();
     this.root = document.createTextNode(content);
-  }
-  render() {
-    return document.createElement('div');
   }
 }

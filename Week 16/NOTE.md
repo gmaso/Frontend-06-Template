@@ -11,3 +11,6 @@
 
 
 添加 children
+- 内容型：以 button 为代表
+- 模板型：以 list 为代表
+

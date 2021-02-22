@@ -17,4 +17,11 @@ export class List extends Component {
   appendChild(child) {
     this.template = (child);
   }
+
+  mountTo(parent) {
+    if (!this.root) {
+      this.render();
+    }
+    parent.appendChild(this.root);
+  }
 }

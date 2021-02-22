@@ -1,6 +1,5 @@
 export function createElement(type, attributes, ...children) {
   let element;
-  console.log(type)
   if (typeof type === 'string') {
     element = new ElementWrapper(type);
   } else {
@@ -21,12 +20,10 @@ export function createElement(type, attributes, ...children) {
         child = new TextWrapper(child);
       }
       console.log(child)
-      // element.appendChild(child);
-      child.mountTo(element);
+      element.appendChild(child);
     }
   }
   processChildren(children);
-  
   return element;
 }
 
@@ -52,7 +49,7 @@ export class Component {
     if (!this.root) {
       this.render();
     }
-    this.root.appendChild(child);
+    child.mountTo(this.root);
   }
 
   mountTo(parent) {
@@ -82,5 +79,12 @@ class TextWrapper extends Component {
   constructor(content) {
     super();
     this.root = document.createTextNode(content);
+  }
+
+  mountTo(parent) {
+    if (!this.root) {
+      this.render();
+    }
+    parent.appendChild(this.root);
   }
 }

@@ -44,3 +44,10 @@ nyc 和 babel 需要相互安装一个插件后才能完成覆盖率统计。
 运行 yo 命令后，快速生成 build、test、coverage 基本开发环境。
 
 
+
+## 工具链总结
+工具链是为了前端开发的质量和效率服务。
+- 通过 generator 快速搭建开发环境，搞定 webpack、babel、mocha 等配置，大大提升开发效率。
+- 通过 mocha 结合 nyc，给单元测试加了简单实例，方便添加测试用例，保证前端开发的质量。
+- Yeoman 用起来很方便，初始化项目 so easy
+

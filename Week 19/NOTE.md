@@ -73,4 +73,14 @@ readable.pipe：把可读流导入一个可写流中。会自动监听 data 事�
 tool 端，添加 archiver 包，进行压缩操作；
 server 端，添加 unzipper 包，进行解压操作。
 
+## 发布工具鉴权
+使用 GitHub oAuth 登录进行鉴权。
 
+### 到 GitHub 网页端新建 GitHub app 
+  settings -> Developer settings -> GitHub Apps -> new GitHub App
+  
+### 调用鉴权过程
+1. tool 端打开 https://github.com/login/oauth/authorize，获取 code
+1. server 端用 code 请求 https://github.com/login/oauth/access_token 获取 token，并传递给 tool 端
+1. tool 端获取到 token，发起发布请求
+1. server 端用 token 去 Github 获取用户信息，鉴权通过后发布代码

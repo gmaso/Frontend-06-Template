@@ -1,20 +1,31 @@
 let http = require('http');
 let fs = require('fs');
 let archiver = require('archiver');
+let child_process = require('child_process');
+let querystring = require('querystring');
 
-const archive = archiver('zip', {
-  zlib: { level: 9}
-});
+// 打开 GitHub oAuth 鉴权 https://github.com/login/oauth/authorize
+child_process.exec(`wslview https://github.com/login/oauth/authorize?client_id=Iv1.aa18298f6e814efd`); // WSL 中需要把 open 替换成 wslview
 
-archive.directory('./sample/', false);
-archive.finalize();
+http.createServer(function(req, res) {
+  console.log(req.url);
+  let query = /\?/.test(req.url) && querystring.parse(req.url.match(/^\/\?([\s\S]+)$/)[1]) || {};
+  console.log(query)
+  publish(query.token);
+  res.end('Success');
+}).listen(8083);
 
-// archive.pipe(fs.createWriteStream('sam.zip'));
+function publish(token) {
+  const archive = archiver('zip', {
+    zlib: { level: 9}
+  });
 
-// fs.stat('./sample.html', (err, stats) => {
-
+  archive.directory('./sample/', false);
+  archive.finalize();
+  
   let request = http.request({
-    hostname: '127.0.0.1',
+    hostname: 'localhost',
+    path: '/publish?token=' + token,
     port: 8082,
     method: 'POST',
     headers: {
@@ -22,19 +33,12 @@ archive.finalize();
       // 'Content-Length': stats.size
     }
   }, response => {
-    console.log(response);
+    response.on('end', () => {
+      request.end();
+    })
   });
 
-
   archive.pipe(request);
-  
-  // let file = fs.createReadStream('./sample.html');
-  
-  // file.pipe(request);
-  
-  // file.on('end', () => {
-  //   request.end();
-  // });
-// });
 
+}
 

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+<pre>
+<script>
+    class XRegExp {
+    constructor(source, flag, root) {
+        this.table = new Map()
+        this.regexp = new RegExp(this.compileRegExp(source, root, 0).source, flag)
+        console.log(this.regexp)
+        console.log(this.table)
+    }
+    compileRegExp(source, name, start) {
+        // 跳过正则的处理
+        if (source[name] instanceof RegExp) {
+            return {
+                source: source[name].source,
+                length: 0
+            }
+        }
+
+        // 匹配产生式定义
+        let length = 0
+        let regexp = source[name].replace(/\<([^>]+)\>/g, (str, $1) => {
+            // 保存捕获组和规则的对应关系
+            this.table.set(start + length, $1)
+            // this.table.set($1, start + length)
+
+            ++length
+            let r = this.compileRegExp(source, $1, start + length)
+            length += r.length
+
+            // 添加捕获组
+            return '(' + r.source + ')'
+        })
+        return {
+            source: regexp,
+            length: length
+        }
+    }
+    exec(str) {
+        let r = this.regexp.exec(str)
+        // console.log(r)
+        return r;
+    }
+    get lastIndex() {
+        return this.regexp.lastIndex
+    }
+    set lastIndex(value) {
+        return this.regexp.lastIndex = value
+    }
+}
+let xregexp = {
+    InputElement: '<WhiteSpace>|<LineTerminator>|<Comments>|<Token>', // 改为字符串，和正则区分
+    WhiteSpace: / /,
+    LineTerminator: /\n/,
+    Comments: /\/\*(?:[^*]|\*[^\/])*\*\/|\/\/[^\n]*/, // 括号的必须用 ?: 非捕获组
+    Token: '<Literal>|<Keywords>|<Identifier>|<Punctuator>', // Keywords 必须写在 Identifier 前面，优先匹配
+    Literal: '<NumbericLiteral>|<BooleanLiteral>|<StringLiteral>|<NullLiteral>',
+    NumbericLiteral: /[1-9][0-9]*|0/, // 需要继续支持小数、十六进制、科学计数法等
+    BooleanLiteral: /true|false/,
+    StringLiteral: /\"(?:[^"\n]|\\[\s\S])*\"|\'(?:[^'\n]|\\[\s\S])*\'/,
+    NullLiteral: /null/,
+    Identifier: /[a-zA-Z$_][a-zA-Z0-9$_]*/,
+    Keywords: /if|else|for|function|let/,
+    Punctuator: /\+\+|=>|===|\+=|\=|\<|\+|-|\*|\/|=|\{|\}|\(|\)|\[|\]|\.|\?|:|,|;/
+}
+
+
+let colors = {
+    InputElement: '',
+    WhiteSpace: '',
+    LineTerminator: '',
+    Comments: 'yellow',
+    Token: '',
+    Literal: '',
+    NumbericLiteral: '',
+    BooleanLiteral: 'blue',
+    StringLiteral: '',
+    NullLiteral: '',
+    Identifier: '',
+    Keywords: 'red',
+    Punctuator: 'green'
+}
+
+function scan(str) {
+    let regexp = new XRegExp(xregexp, 'g', 'InputElement')
+    console.log(regexp, regexp.lastIndex, str.length)
+    while (regexp.lastIndex < str.length) {
+        let r = regexp.exec(str)
+        for (let i = r.length - 1; i > 0; i--) {
+            if (r[i] !== void 0) {
+                const type = regexp.table.get(i-1)
+                console.log(type, JSON.stringify(r[0]))
+                // 可以通过类型进行语法高亮
+                document.write('<span style="color:' + colors[type] + '">' + r[0] + '</span>')
+                break
+            }
+        }
+    }
+}
+// 匹配
+scan(`
+for (let i = 0; i < 100; i += 1) {
+    for (let j = 0; j < 100; j += 1) {
+        let div = document.createElement('div');
+        div.classList.add('cell');
+        if (map[i * 100 + j] === 1) {
+            div.classList.add('black');
+        }
+
+        div.addEventListener('mouseover', () => {
+            if (mouseDown) {
+                if (clear) {
+                    div.classList.remove('black');
+                    map[i * 100 + j] = 0;
+                } else {
+                    div.classList.add('black');
+                    map[i * 100 + j] = 1;
+                }
+            }
+        })
+        container.appendChild(div);
+    }
+}
+`)
+</script>
+</pre>
+</body>
+
+</html>

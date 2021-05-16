@@ -1,0 +1,194 @@
+# 语法树
+
+
+
+## 构建语法树
+
+基于 token 构建语法树，语法树做精简后得到 AST。以应用为主，会简化。
+
+社区里语法分析较多使用 **LL 风格**，代码与 BNF 一致。以下采用 **LR 风格**。
+
+首先改造 BNF 为 JavaScript 表示。
+
+```javascript
+let syntax = {
+    Program: [
+        ['StatementList']
+    ],
+    StatementList: [
+        ['Statement'], 
+        ['StatementList', 'Statement']
+    ],
+    Statement: [
+        ['ExpressionStatement'],
+        ['IfStatement'],
+        ['VairableDelaration'],
+        ['FunctionDelaration']
+    ],
+    ExpressionStatement: [
+        ['Expression', ';'],
+    ],
+    Expression: [
+        ['AdditiveExpression'],
+    ],
+    IfStatement: [
+        ['if', '(', 'Expression', ')', 'Statement']
+    ],
+    VariableDeclaration: [
+        ['var', 'Identifier', ';']
+    ],
+    FunctionDeclaration: [
+        ['function', 'Identifier', '(', ')', '{', 'StatementList', '}']
+    ],
+    AdditiveExpression: [
+        ['MultiplicativeExpression'],
+        ['AdditiveExpression', '+', 'MultiplicativeExpression']
+        ['AdditiveExpression', '-', 'MultiplicativeExpression']
+    ],
+    MultiplicativeExpression: [
+        ['PrimaryExpression'],
+        ['MultiplicativeExpression', '*', 'PrimaryExpression']
+        ['MultiplicativeExpression', '/', 'PrimaryExpression']
+    ],
+    PrimaryExpression: [
+        ['(', 'Expression', ')'],
+        ['Literal'],
+        ['Identifier']
+    ],
+    Literal: [
+        ['Number']
+    ],
+}
+```
+
+思考：当前能够接受的 token 是什么？需要通过规则展开，使用 BFS，查找允许的终结符，称为**求 closure**。
+
+代码实现见 toy-js-02。
+
+把词法分析器的 terminal symbol 输入语法分析器中，进行规则匹配，当匹配到规则末尾的时候进行 **reduce**，合成 no-terminal symbol，同时存储 children。通过递归 reduce，最终就能得到一颗语法树。语法树中
+
+注意：syntax 规则一定要定义完成，否则会导致 unexpected token 报错。（var 声明规则少定义了个分号，调试了 1 个多小时😂）。
+
+步骤：
+
+1. 编写 syntax 规则
+2. 根据规则求 closure，得到状态转移规则
+3. 逐个处理词法解析得到的 symbol，规则匹配则进入对应的状态，到达规则末尾后进行 reduce，生成 non-terminal symbol
+4. 逐级 reduce 后，得到语法树
+
+
+
+## 执行语法树
+
+ECMA-262 标准：
+
+A.2 Expressions 最复杂的部分，级联定义。语法定义的结构就决定了优先级问题。
+
+A.3 Statements
+
+A.4 Functions and Classes
+
+A.5 Scripts and Modules
+
+代码见 toy-js-03。
+
+从语法树的根开始，分别处理。
+
+对于变量声明，需要有个地方存储变量，由此引出了运行时的相关问题，如 EnvironmentRecord 用于存储变量。
+
+## 运行时
+
+#### 运行时中定义的 Number 类型
+
+IEEE754 双精度浮点数表示法。1 符号位 + 11 指数位 + 52 精度位。指数位为指数 + 1024，避免小数需要用负号表示。52位前还有个默认的1隐藏。
+
+对于高精度的场景，不要用浮点数进行运算。
+
+#### String 类型
+
+字符集、码点（code point）、字形、字体。
+
+字符集：ASCII、Unicode、UCS（大概相当于 Unicode 2.0，码点与编码统一，固定2个字节）、GB、ISO-8859（欧洲的一批字符集标准）、BIG5
+
+JavaScript 选择了 Unicode 字符集。
+
+编码（计算机保存码点的方式）：UTF-8（变长存储，需要有控制位）、UTF-16（晚于 UCS，规定了超出 2个字节时的控制位，前两个字节用 110110 开头，后连个用 110111 开头，有效位数最多 20位）
+
+JavaScript 在内存中采用 UTF-16 进行存储，String 也是用 UTF-16 存储的 。char 系列 API 其实是针对 UTF-16 资源的。
+
+codePoint 系列的 API 用于处理超出基本平面的字符处理。
+
+## JavaScript 语义处理
+
+代码见 toy-js-04
+
+#### 数值字面量的处理
+
+通过对语法树的执行，把语法分析中的数值转化成运行时的数字，也就是语义。
+
+语法、语义、运行时。
+
+#### 字符串字面量的处理
+
+需要处理转义、\u 等情况。
+
+#### 对象
+
+对象是符合人类直觉的对世界的认知。
+
+ 对象的三要素：Identifier、State、Behavior
+
+唯一标识：JavaScript 中对象的内存地址作为唯一标识
+
+状态：用状态来描述对象
+
+行为；状态的改变
+
+##### Object——Class
+
+常用类来描述对象。
+
+归类流派：多继承，如 C++
+
+分类流派：单继承结构，有一个基类 Object
+
+##### Object——Prototype
+
+原型是一种更接近人类原始认知的描述对象的方法。并不做严谨的分类，而是采用“相似”这样的方式来描述对象。任何对象仅仅需要描述自己与原型的区别即可。
+
+Nihilo：Null 对象
+
+JavaScript 使用引用型的原型。运行中修改后会影响所有修改对象。
+
+优先使用 class，替代 new 方式。
+
+#### JavaScript 对象
+
+JavaScript 运行时中，原生对象只需要关心 property 和 prototype 即可。
+
+property：key-value 键值对，分数据属性或访问器属性 getter/setter
+
+prototype：原型链，属性访问时生效
+
+##### Object API/Grammer 四组
+
+- {} . [] Object.defineProperty
+- Object.create / Object.setPrototypeOf / Object.getPrototypeOf
+- new / class / extends
+- new / function prototype
+
+##### Function Object
+
+函数有一个 [[call]] 行为。
+
+JavaScript 中很多对象都有特殊的行为。
+
+##### Host Object
+
+宿主环境提供的对象。
+
+## 为 toy-js 添加对象类型
+
+代码见 toy-js-05
+
+套路：先理解运行时的样子，再添加语法，再语义解析。

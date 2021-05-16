@@ -313,7 +313,7 @@ LexicalEnvironment 和 VariableEnvironment 的保存结构。基类是 Environme
 
 每一个函数都会生成一个闭包。包含两个部分：代码部分和环境部分（Environment Record）。
 
-不管函数被哪里使用，都会带上定义时的 Environment Record。
+**不管函数被哪里使用，都会带上定义时的 Environment Record。**
 
 **Realm**
 

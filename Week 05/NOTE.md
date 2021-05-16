@@ -3,12 +3,12 @@
 ## 作业代码
 ### 1. [Reactive 实现原理（一）](./proxy_01.html)
 ### 2. [Reactive 实现原理（二）](./proxy_02.html)
-   
+
    问题：由于每次操作都会触发所有 callbacks 的调用，导致性能问题和多余的操作。
 ### 3. [Reactive 实现原理（三）](./proxy_03_b.html)
 
    优化上一步中的性能问题。实现只在对应的对象和属性上，才触发 callback。
-   
+
    建立 reactive 和 effect 中间的连接。通过调用 callback 函数，然后在代理对象上监控到访问，从而建立对象属性和 callback 的关系。
 
 一、 实现一
@@ -255,14 +255,14 @@ HTML 标记转换成文档对象模型（DOM）；CSS 标记转换成 CSS 对象
 
 浏览器解析网页的步骤：字节 → 字符 → token → 节点 → 对象模型。
 
-![DOM 解析流程](./full-process.png)
+![DOM 解析流程](./images/full-process.png)
 1. 转换：浏览器读取 HTML 原始直接，根据指定编码转换成字符。
 2. 令牌化：将字符串转换成 W3C HTML5 标准规定的各种令牌，如 “<html>”、“<body>”，以及尖括号内的字符串。每个令牌都具有特殊含义和一组规则。
 3. 词法分析：令牌转换成定义其属性和规则的节点对象。
 4. DOM 构建：把创建的对象链接在一个树数据结构内。
 
 
-![CSSOM 解析流程](./cssom-construction.png)
+![CSSOM 解析流程](./images/cssom-construction.png)
 ```CSS
 body { font-size: 16px }
 p { font-weight: bold }
@@ -270,7 +270,7 @@ span { color: red }
 p span { display: none }
 img { float: right }
 ```
-![CSSOM 树结构](./cssom-tree.png)
+![CSSOM 树结构](./images/cssom-tree.png)
 为页面上任何对象计算样式时，都会从该对象所属树的根节点开始，向下级联样式。
 
 ## 渲染树
@@ -278,7 +278,7 @@ DOM 和 CSSOM 是独立的数据结构，如何作用到屏幕上？
 
 CSSOM 树和 DOM 树合并成**渲染树**，用于计算每个可见元素的**布局**，并输出给**绘制**流程，然后将像素渲染到屏幕上。
 
-![渲染树结构](./render-tree-construction.png)
+![渲染树结构](./images/render-tree-construction.png)
 
 ### 构建渲染树
 1. 从 DOM 树的根节点开始遍历每个可见节点。

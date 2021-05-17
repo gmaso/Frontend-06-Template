@@ -192,3 +192,20 @@ JavaScript 中很多对象都有特殊的行为。
 代码见 toy-js-05
 
 套路：先理解运行时的样子，再添加语法，再语义解析。
+
+## 执行上下文 ExecutionContext
+
+词法环境 LexicalEnvirontment
+
+realm：保存 global、Object、Object 的 prototype
+
+VariableEnvironment：大部分情况下与 LexicalEnvironment 相同
+
+#### Reference 类型
+
+用于保存变量的对象和值，JavaScript 运行时中真实存在的数据类型，不能直接访问到。
+
+#### 增加支持赋值
+
+通过在当前 EC 中的 LexicalEnvironment 中保存 Reference 对象来存储变量和值，赋值时修改此对象。
+

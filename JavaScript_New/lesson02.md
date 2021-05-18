@@ -195,6 +195,8 @@ JavaScript 中很多对象都有特殊的行为。
 
 ## 执行上下文 ExecutionContext
 
+代码见 toy-js-06
+
 词法环境 LexicalEnvirontment
 
 realm：保存 global、Object、Object 的 prototype
@@ -208,4 +210,26 @@ VariableEnvironment：大部分情况下与 LexicalEnvironment 相同
 #### 增加支持赋值
 
 通过在当前 EC 中的 LexicalEnvironment 中保存 Reference 对象来存储变量和值，赋值时修改此对象。
+
+## 表达式和运算
+
+代码见 toy-js-07
+
+四则运算和 member 调用、function call、new
+
+语法规则添加时优先级低的在前面。
+
+new 运算优先级很复杂
+
+根据 ECMA-262 语法精简来实现，修改添加语法规则。
+
+#### 为便于代码管理，拆分文件
+
+见 toy-js-08
+
+Realm 等类拆分到单独文件 runtime.js 中
+
+Evaluator 通常就是 JavaScript 的一个实例。
+
+
 

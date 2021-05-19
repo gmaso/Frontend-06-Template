@@ -40,6 +40,30 @@ export class Evaluator {
         let right = this.evaluate(node.children[2])
         left.set(right)
     }
+    LogicalORExpression(node) {
+        if (node.children.length === 1) {
+            return this.evaluate(node.children[0])
+        }
+        // 短路逻辑
+        let left = this.evaluate(node.children[0])
+        if (left) {
+            return left
+        }
+        let right = this.evaluate(node.children[2])
+        return right
+    }
+    LogicalANDExpression(node) {
+        if (node.children.length === 1) {
+            return this.evaluate(node.children[0])
+        }
+        // 短路逻辑
+        let left = this.evaluate(node.children[0])
+        if (!left) {
+            return left
+        }
+        let right = this.evaluate(node.children[2])
+        return right
+    }
     AdditiveExpression(node) {
         if (node.children.length === 1) {
             return this.evaluate(node.children[0])
@@ -98,10 +122,9 @@ export class Evaluator {
         }
         // console.log(value)
         return value
-
     }
     StringLiteral(node) {
-        console.log(node)
+        // console.log(node)
         let result = []
         // 获取到字符串的值，处理转义、码点等情况
         for (let i = 1; i < node.value.length - 1; i++) {
@@ -167,6 +190,52 @@ export class Evaluator {
             enumerable: true,
             configurable: true
         })
+    }
+    LeftHandSideExpression(node) {
+        return this.evaluate(node.children[0])
+    }
+    CallExpression(node) {
+        if (node.children.length === 1) {
+            this.Property(node.children[0], object)
+        }
+        if (node.children.length === 2) {
+            let fnuc = this.evaluate(node.children[0])
+            let args = this.evaluate(node.children[1])
+            return func.call(args)
+        }
+    }
+    NewExpression(node) {
+        if (node.children.length === 1) {
+            return this.evaluate(node.children[0])
+        }
+        if (node.children.length === 2) {
+            let cls = this.evaluate(node.children[1])
+            return cls.construct()
+            // let object = this.realm.Object.construct()
+            // let cls = this.evaluate(node.children[1])
+            // let result = cls.call(object)
+            // if (typeof result === 'object') {
+            //     return result
+            // } else {
+            //     return object
+            // }
+        }
+    }
+    MemberExpression(node) {
+        if (node.children.length === 1) {
+            return this.evaluate(node.children[0])
+        }
+        if (node.children.length === 3) {
+            let obj = this.evaluate(node.children[0]).get()
+            let prop = obj.get(node.children[2].name)
+            if ('value' in prop) {
+                return prop.value
+            }
+            if ('get' in prop) {
+                return prop.get.call(obj)
+            }
+            return prop
+        }
     }
     Identifier(node) {
         // 变量存在 EC 中

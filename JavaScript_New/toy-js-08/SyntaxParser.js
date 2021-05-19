@@ -18,24 +18,6 @@ let syntax = {
         ['VariableDeclaration'],
         ['FunctionDelaration']
     ],
-    ExpressionStatement: [
-        ['Expression', ';'],
-    ],
-    Expression: [
-        ['AssignmentExpression'],
-    ],
-    AssignmentExpression: [
-        ['LeftHandSideExpression', '=', 'LogicalORExpression'],
-        ['LogicalORExpression'],
-    ],
-    LogicalORExpression: [
-        ['LogicalANDExpression'],
-        ['LogicalORExpression', '||', 'LogicalANDExpression']
-    ],
-    LogicalANDExpression: [
-        ['AdditiveExpression'],
-        ['LogicalANDExpression', '&&', 'AdditiveExpression']
-    ],
     IfStatement: [
         ['if', '(', 'Expression', ')', 'Statement']
     ],
@@ -45,6 +27,24 @@ let syntax = {
     ],
     FunctionDeclaration: [
         ['function', 'Identifier', '(', ')', '{', 'StatementList', '}']
+    ],
+    ExpressionStatement: [
+        ['Expression', ';'],
+    ],
+    Expression: [
+        ['AssignmentExpression'],
+    ],
+    AssignmentExpression: [
+        ['LogicalORExpression'],
+        ['LeftHandSideExpression', '=', 'LogicalORExpression'],
+    ],
+    LogicalORExpression: [
+        ['LogicalANDExpression'],
+        ['LogicalORExpression', '||', 'LogicalANDExpression']
+    ],
+    LogicalANDExpression: [
+        ['AdditiveExpression'],
+        ['LogicalANDExpression', '&&', 'AdditiveExpression']
     ],
     AdditiveExpression: [
         ['MultiplicativeExpression'],
@@ -119,7 +119,10 @@ function closure(state) {
         // console.log(symbol)
         if (syntax[symbol]) {
             for (let rule of syntax[symbol]) {
-                !state[rule[0]] && queue.push(rule[0])
+                // 判断是否已存在，存在则不入队
+                if (!state[rule[0]]) {
+                    queue.push(rule[0])
+                }
                 let current = state
                 for (let part of rule) {
                     if (!current[part]) {
@@ -135,7 +138,7 @@ function closure(state) {
     // 递归下层
     for (let symbol in state) {
         if (symbol.match(/\$/)) {
-            return
+            continue
         }
         if (hash[JSON.stringify(state[symbol])]) {
             state[symbol] = hash[JSON.stringify(state[symbol])]
@@ -154,6 +157,7 @@ let start = {
 }
 
 closure(start)
+console.log('语法规则解析完成', start)
 
 export function parse(source) {
     let stack = [start]
@@ -163,6 +167,7 @@ export function parse(source) {
     function reduce() {
         let state = stack[stack.length - 1]
 
+        // console.log(state.$reduceType, state.$reduceLength)
         if (state.$reduceType) {
             // 存储子级
             let children = []
@@ -195,10 +200,19 @@ export function parse(source) {
         }
     }
 
+    // 词法解析测试
+    // let lex = scan(source)
+    // for (let symbol/** terminal symbol */ of lex) {
+    //     console.log(symbol)
+    // }
+    // console.log('词法解析无误')
+    
     for (let symbol/** terminal symbol */ of scan(source)) {
         // 逐个处理 symbol
+        // console.log(symbol)
         shift(symbol)
     }
 
+    // 最后 reduce 一次
     return reduce()
 }

@@ -259,3 +259,5 @@ Evaluator 通常就是 JavaScript 的一个实例。
 
 ##### while 逻辑
 
+更 IfStatement 逻辑很类似。加减法执行代码少写了个 type，调好一会儿。
+

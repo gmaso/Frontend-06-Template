@@ -39,6 +39,21 @@ export class Evaluator {
             return this.evaluate(node.children[4])
         }
     }
+    WhileStatement(node) {
+        while (true) {
+            let condition = this.evaluate(node.children[2])
+            // 对 condition 进行解应用
+            if (condition instanceof Reference) {
+                condition = condition.get()
+            }
+            if (condition.toBoolean().value) {
+                console.log('while')
+                this.evaluate(node.children[4])
+            } else {
+                break;
+            }
+        }
+    }
     ExpressionStatement(node) {
         return this.evaluate(node.children[0])
     }
@@ -99,10 +114,11 @@ export class Evaluator {
             if (right instanceof Reference) {
                 right = right.get()
             }
-            if (node.children[1] === '+') {
-                return left + right
-            } else if (node.children[1] === '-') {
-                return left - right
+            if (node.children[1].type === '+') {
+                // if ()
+                return left.value + right.value
+            } else if (node.children[1].type === '-') {
+                return new JSNumber(left.value - right.value)
             }
         }
     }

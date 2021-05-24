@@ -256,3 +256,6 @@ Evaluator 通常就是 JavaScript 的一个实例。
 为处理 IfStatement 条件判断，必须要有类型转换。
 
 为每个类型新建类，在类上添加相关的类型获取和转换规则。
+
+##### while 逻辑
+

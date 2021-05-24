@@ -69,8 +69,8 @@ let xregexp = {
     StringLiteral: /\"(?:[^"\n]|\\[\s\S])*\"|\'(?:[^'\n]|\\[\s\S])*\'/,
     NullLiteral: /null/,
     Identifier: /[a-zA-Z$_][a-zA-Z0-9$_]*/,
-    Keywords: /if|else|for|function|let|var|new/,
-    Punctuator: /\|\||\&\&|\+\+|=>|===|\+=|\=|\<|\+|-|\*|\/|=|\{|\}|\(|\)|\[|\]|\.|\?|:|,|;/, // 复合的匹配需要在前面
+    Keywords: /if|else|for|function|let|var|new|while/,
+    Punctuator: /\|\||\&\&|\+\+|=>|===|\+=|\=|\<|\+|\-|\*|\/|=|\{|\}|\(|\)|\[|\]|\.|\?|:|,|;/, // 复合的匹配需要在前面
 }
 
 export function* scan(str) {

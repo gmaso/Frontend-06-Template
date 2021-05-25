@@ -45,3 +45,16 @@ break 能打断语句块中后续语句的执行。
 往 ecs 中压入一个新的 ExecutionContext。
 
 在每个 block 的前部压入新的 ExecutionContext，执行完代码后弹出，然后返回执行结构。
+
+
+
+## 函数声明和调用
+
+函数要区分声明函数和调用函数两个不同阶段。FunctionDelaration 和 CallExpression 两个语法。
+
+在全局对象中添加 log 对象，方便打印参数。
+
+完善 CallExpression 的 Arguments 语法定义和运行时。
+
+
+

@@ -82,6 +82,14 @@ let syntax = {
         ['MemberExpression', 'Arguments'],
         ['CallExpression', 'Arguments'],
     ],
+    Arguments: [
+        ['(', ')'],
+        ['(', 'ArgumentList', ')']
+    ],
+    ArgumentList: [
+        ['AssignmentExpression'],
+        ['ArgumentList', ',', 'AssignmentExpression']
+    ],
     // new 优先级高于调用
     NewExpression: [
         ['MemberExpression'],
@@ -219,11 +227,11 @@ export function parse(source) {
     }
 
     // 词法解析测试
-    // let lex = scan(source)
-    // for (let symbol/** terminal symbol */ of lex) {
-    //     console.log(symbol)
-    // }
-    // console.log('词法解析无误')
+    let lex = scan(source)
+    for (let symbol/** terminal symbol */ of lex) {
+        console.log(symbol)
+    }
+    console.log('词法解析无误')
     
     for (let symbol/** terminal symbol */ of scan(source)) {
         // 逐个处理 symbol

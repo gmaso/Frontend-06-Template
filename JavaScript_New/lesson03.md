@@ -36,3 +36,12 @@ break 能打断语句块中后续语句的执行。
 
 改造 reference 对象。
 
+
+
+#### block 作用域
+
+切换 EnvironmentRecord ，才能切换作用域。
+
+往 ecs 中压入一个新的 ExecutionContext。
+
+在每个 block 的前部压入新的 ExecutionContext，执行完代码后弹出，然后返回执行结构。

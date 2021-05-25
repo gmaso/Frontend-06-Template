@@ -16,7 +16,7 @@ export class EnvironmentRecord {
         this.variables = new Map
     }
     add(name) {
-        this.variables.add(name)
+        this.variables.set(name, new JSUndefined)
     }
     get(name) {
         if (this.variables.has(name)) {
@@ -29,7 +29,7 @@ export class EnvironmentRecord {
     }
     // set 会往外层处理，最终到 global，保证设置成功（非严格模式下）
     set(name, value = new JSUndefined) {
-        return this.object.set(name, value)
+        return this.variables.set(name, value)
     }
 }
 export class ObjectEnvironmentRecord {
@@ -192,7 +192,8 @@ export class JSObject extends JSValue {
         })
     }
     get(name) {
-        return this.getProperty(name).value
+        let property = this.getProperty(name)
+        return property ? property.value : new JSUndefined()
     }
     getPrototype(proto) {
         return this.prototype

@@ -45,9 +45,18 @@ export class Evaluator {
         return new CompletionRecord('continue')
     }
     Block(node) {
-        if (node.children.length === 3) {
-            return this.evaluate(node.children[1])
+        if (node.children.length === 2) {
+            return
         }
+        let runningEc = this.ecs[this.ecs.length - 1]
+        this.ecs.push(new ExecutionContext(
+            this.realm,
+            new EnvironmentRecord(runningEc.lexicalEnvironment), // let/const 声明
+            runningEc.variableEnvironment /* 涉及到 var 声明的处理 */
+        ))
+        let result = this.evaluate(node.children[1])
+        this.ecs.pop()
+        return result
     }
     IfStatement(node) {
         let condition = this.evaluate(node.children[2])
@@ -164,7 +173,7 @@ export class Evaluator {
     VariableDeclaration(node) {
         let name = node.children[1].name;
         let runningEc = this.ecs[this.ecs.length - 1]
-        runningEc.variableEnvironment.add(name, new JSUndefined)
+        runningEc.lexicalEnvironment.add(name, new JSUndefined)
         return new CompletionRecord('normal', new JSUndefined)
     }
     NumbericLiteral(node) {

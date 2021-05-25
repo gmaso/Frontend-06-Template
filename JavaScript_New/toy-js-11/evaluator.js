@@ -1,14 +1,19 @@
 import { 
     ExecutionContext, Realm, Reference,
-    JSNumber, JSString, JSBoolean, JSObject, JSNull, JSUndefined, JSSymbol, CompletionRecord
+    JSNumber, JSString, JSBoolean, JSObject, JSNull, JSUndefined, JSSymbol, 
+    CompletionRecord, EnvironmentRecord, ObjectEnvironmentRecord
 } from './runtime.js'
 
 // Evaluator 通常就是 js 的一个实例
 export class Evaluator {
     constructor() {
         this.realm = new Realm()
-        this.globalObject = {}
-        this.ecs = [new ExecutionContext(this.realm, this.globalObject)]
+        this.globalObject = new JSObject()
+        this.ecs = [new ExecutionContext(
+                this.realm,
+                new ObjectEnvironmentRecord(this.globalObject),
+                new ObjectEnvironmentRecord(this.globalObject)
+            )]
     }
     evaluate(node) {
         if (this[node.type]) {
@@ -76,7 +81,11 @@ export class Evaluator {
         }
     }
     ExpressionStatement(node) {
-        return new CompletionRecord('normal', this.evaluate(node.children[0]))
+        let res = this.evaluate(node.children[0])
+        if (res instanceof Reference) {
+            res = res.get()
+        }
+        return new CompletionRecord('normal', res)
     }
     Expression(node) {
         return this.evaluate(node.children[0])
@@ -137,7 +146,7 @@ export class Evaluator {
             }
             if (node.children[1].type === '+') {
                 // if ()
-                return left.value + right.value
+                return new JSNumber(left.value + right.value)
             } else if (node.children[1].type === '-') {
                 return new JSNumber(left.value - right.value)
             }
@@ -155,7 +164,7 @@ export class Evaluator {
     VariableDeclaration(node) {
         let name = node.children[1].name;
         let runningEc = this.ecs[this.ecs.length - 1]
-        runningEc.variableEnvironment[name] = new JSUndefined
+        runningEc.variableEnvironment.add(name, new JSUndefined)
         return new CompletionRecord('normal', new JSUndefined)
     }
     NumbericLiteral(node) {

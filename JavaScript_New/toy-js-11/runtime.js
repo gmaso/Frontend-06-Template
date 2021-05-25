@@ -11,10 +11,42 @@ export class Realm {
 }
 
 export class EnvironmentRecord {
-    constructor() {
-        this.thisValue = null
-        this.variable = new Map()
-        this.outer = null
+    constructor(outer) {
+        this.outer = outer
+        this.variables = new Map
+    }
+    add(name) {
+        this.variables.add(name)
+    }
+    get(name) {
+        if (this.variables.has(name)) {
+            return this.variables.get(name)
+        } else if (this.outer) {
+            return this.outer.get(name)
+        } else {
+            return new JSUndefined
+        }
+    }
+    // set 会往外层处理，最终到 global，保证设置成功（非严格模式下）
+    set(name, value = new JSUndefined) {
+        return this.object.set(name, value)
+    }
+}
+export class ObjectEnvironmentRecord {
+    constructor(object, outer) {
+        this.object = object
+        this.outer = outer
+    }
+    add(name) {
+        this.object.set(name, new JSUndefined)
+    }
+    get(name) {
+        return this.object.get(name)
+        // TODO: with statement need outer
+    }
+    // set 会往外层处理，最终到 global，保证设置成功（非严格模式下）
+    set(name, value = new JSUndefined) {
+        return this.object.set(name, value)
     }
 }
 
@@ -43,10 +75,10 @@ export class Reference {
         this.property = property
     }
     set(value) {
-        this.object[this.property] = value
+        this.object.set(this.property, value)
     }
     get() {
-        return this.object[this.property]
+        return this.object.get(this.property)
     }
 }
 
@@ -150,15 +182,27 @@ export class JSObject extends JSValue {
     setPrototype(proto) {
         this.prototype = proto
     }
+    set(name, value) {
+        // TODO：判断是否可写
+        this.setProperty(name, {
+            value: value, 
+            enumerable: true,
+            configurable: true,
+            writable: true
+        })
+    }
+    get(name) {
+        return this.getProperty(name).value
+    }
     getPrototype(proto) {
-        this.prototype
+        return this.prototype
     }
     setProperty(name, attribute) {
         this.properties.set(name, attribute)
     }
     getProperty(name) {
-        // 和原型有关
-
+        // TODO: 和原型、getter 有关
+        return this.properties.get(name)
     }
 }
 

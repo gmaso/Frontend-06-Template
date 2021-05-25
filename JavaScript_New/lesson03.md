@@ -26,3 +26,13 @@ break 能打断语句块中后续语句的执行。
 
 代码见 toy-js-11
 
+要处理函数必须要有作用域。
+
+在之前的标准中，用 scope chain 表示运行时的作用域对象，与 scope 代表的语义上的代码作用范围有歧义。在新标准中，用 environment 来表示运行时的作用域对象。
+
+在 toy-js 中添加 EnvironmentRecord 对象来表示。
+
+改造 evaluator 中的 ecs 对象。
+
+改造 reference 对象。
+

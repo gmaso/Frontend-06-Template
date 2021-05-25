@@ -19,6 +19,18 @@ export class Evaluator {
                 new ObjectEnvironmentRecord(this.globalObject)
             )]
     }
+    evaluateModule(node) {
+        let globalEc = this.ecs[0]
+        let newEc = new ExecutionContext(
+            this.realm,
+            new ObjectEnvironmentRecord(globalEc.lexicalEnvironment),
+            new ObjectEnvironmentRecord(globalEc.lexicalEnvironment)
+        )
+        this.ecs.push(newEc)
+        let result = this.evaluate(node)
+        this.ecs.pop()
+        return result
+    }
     evaluate(node) {
         if (this[node.type]) {
             return this[node.type](node)
@@ -188,10 +200,20 @@ export class Evaluator {
         let func = new JSObject()
         func.call = args => {
             // 需要处理作用域等复杂问题
-            this.evaluate(code)
+            // 处理上下文
+            let newEc = new ExecutionContext(
+                this.realm,
+                new EnvironmentRecord(func.enviroment),
+                new EnvironmentRecord(func.enviroment)
+            )
+            this.ecs.push(newEc)
+            let result = this.evaluate(code)
+            this.ecs.pop()
+            return result
         }
         // 保存函数到词法作用域
         let runningEc = this.ecs[this.ecs.length - 1]
+        func.enviroment = runningEc.lexicalEnvironment
         runningEc.lexicalEnvironment.add(name)
         runningEc.lexicalEnvironment.set(name, func)
         return new CompletionRecord('normal')

@@ -1,10 +1,15 @@
 <script type="module" src="./run.js"></script>
 
 <textarea name="" id="source" cols="30" rows="10">
+let x;
+x = 1;
 function a() {
-    let x;
-    log('hello');
+    log(x);
 }
-a();
+{
+    let x;
+    x = 10;
+    a();
+}
 </textarea>
 <button id="run">Run</button>

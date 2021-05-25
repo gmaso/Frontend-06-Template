@@ -17,7 +17,7 @@ let syntax = {
         ['IfStatement'],
         ['WhileStatement'],
         ['VariableDeclaration'],
-        ['FunctionDelaration'],
+        ['FunctionDeclaration'],
         ['Block'],
         ['BreakStatement'],
         ['ContinueStatement'],

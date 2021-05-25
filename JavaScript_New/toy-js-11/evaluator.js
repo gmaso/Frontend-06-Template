@@ -180,6 +180,22 @@ export class Evaluator {
         runningEc.lexicalEnvironment.add(name, new JSUndefined)
         return new CompletionRecord('normal', new JSUndefined)
     }
+    FunctionDeclaration(node) {
+        // debugger
+        let name = node.children[1].name
+        let code = node.children[node.children.length - 2]
+        // 新建函数
+        let func = new JSObject()
+        func.call = args => {
+            // 需要处理作用域等复杂问题
+            this.evaluate(code)
+        }
+        // 保存函数到词法作用域
+        let runningEc = this.ecs[this.ecs.length - 1]
+        runningEc.lexicalEnvironment.add(name)
+        runningEc.lexicalEnvironment.set(name, func)
+        return new CompletionRecord('normal')
+    }
     NumbericLiteral(node) {
         // console.log(node)
         // 处理数字
@@ -247,7 +263,7 @@ export class Evaluator {
                 result.push(node.value[i])
             }
         }
-        console.log(result)
+        // console.log(result)
         return new JSString(result)
     }
     ObjectLiteral(node) {

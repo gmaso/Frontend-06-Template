@@ -56,5 +56,13 @@ break 能打断语句块中后续语句的执行。
 
 完善 CallExpression 的 Arguments 语法定义和运行时。
 
+#### 定义
+
+完善 FunctionDeclaration 的语法和运行时。
+
+主要处理 Identifier 和 StatementList 部分。
+
+新建 JSObject 保存 function，并添加到词法作用域中。
+
 
 
